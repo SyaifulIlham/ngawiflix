@@ -22,19 +22,27 @@ public class BookingDAO {
             // Generate booking code
             String bookingCode = generateBookingCode();
             
-            // Insert booking
-            String sql = "INSERT INTO bookings (booking_code, schedule_id, total_seats, total_price, " +
+            // Insert booking with user_id
+            String sql = "INSERT INTO bookings (booking_code, user_id, schedule_id, total_seats, total_price, " +
                         "customer_name, customer_email, customer_phone, booking_status) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, 'confirmed') RETURNING booking_id";
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed') RETURNING booking_id";
             
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, bookingCode);
-            pstmt.setInt(2, booking.getScheduleId());
-            pstmt.setInt(3, booking.getTotalSeats());
-            pstmt.setBigDecimal(4, booking.getTotalPrice());
-            pstmt.setString(5, booking.getCustomerName());
-            pstmt.setString(6, booking.getCustomerEmail());
-            pstmt.setString(7, booking.getCustomerPhone());
+            
+            // Set user_id (NULL if 0)
+            if (booking.getUserId() > 0) {
+                pstmt.setInt(2, booking.getUserId());
+            } else {
+                pstmt.setNull(2, java.sql.Types.INTEGER);
+            }
+            
+            pstmt.setInt(3, booking.getScheduleId());
+            pstmt.setInt(4, booking.getTotalSeats());
+            pstmt.setBigDecimal(5, booking.getTotalPrice());
+            pstmt.setString(6, booking.getCustomerName());
+            pstmt.setString(7, booking.getCustomerEmail());
+            pstmt.setString(8, booking.getCustomerPhone());
             
             rs = pstmt.executeQuery();
             int bookingId = 0;
@@ -122,7 +130,20 @@ public class BookingDAO {
     
     public List<Booking> getBookingsByEmail(String email) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT * FROM bookings WHERE customer_email = ? ORDER BY created_at DESC";
+        String sql = "SELECT b.*, " +
+                    "m.title as movie_title, " +
+                    "s.show_time, " +
+                    "t.theater_name, " +
+                    "STRING_AGG(st.row_letter || st.seat_number, ', ' ORDER BY st.row_letter, st.seat_number) as seat_codes " +
+                    "FROM bookings b " +
+                    "LEFT JOIN schedules s ON b.schedule_id = s.schedule_id " +
+                    "LEFT JOIN movies m ON s.movie_id = m.movie_id " +
+                    "LEFT JOIN theaters t ON s.theater_id = t.theater_id " +
+                    "LEFT JOIN booking_details bd ON b.booking_id = bd.booking_id " +
+                    "LEFT JOIN seats st ON bd.seat_id = st.seat_id " +
+                    "WHERE b.customer_email = ? " +
+                    "GROUP BY b.booking_id, m.title, s.show_time, t.theater_name " +
+                    "ORDER BY b.created_at DESC";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -142,6 +163,83 @@ public class BookingDAO {
                     booking.setCustomerEmail(rs.getString("customer_email"));
                     booking.setCustomerPhone(rs.getString("customer_phone"));
                     booking.setCreatedAt(rs.getTimestamp("created_at"));
+                    
+                    // Additional fields from joins - handle NULL values
+                    booking.setMovieTitle(rs.getString("movie_title"));
+                    
+                    // Convert show_time timestamp to string
+                    Timestamp showTime = rs.getTimestamp("show_time");
+                    if (showTime != null) {
+                        booking.setShowtime(showTime.toString());
+                    }
+                    
+                    booking.setTheaterName(rs.getString("theater_name"));
+                    
+                    String seatCodes = rs.getString("seat_codes");
+                    if (seatCodes != null && !seatCodes.isEmpty()) {
+                        booking.setSeatCodes(List.of(seatCodes.split(", ")));
+                    }
+                    
+                    bookings.add(booking);
+                }
+            }
+        }
+        
+        return bookings;
+    }
+    
+    public List<Booking> getBookingsByUserId(int userId) throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        String sql = "SELECT b.*, " +
+                    "m.title as movie_title, " +
+                    "s.show_time, " +
+                    "t.theater_name, " +
+                    "STRING_AGG(st.row_letter || st.seat_number, ', ' ORDER BY st.row_letter, st.seat_number) as seat_codes " +
+                    "FROM bookings b " +
+                    "LEFT JOIN schedules s ON b.schedule_id = s.schedule_id " +
+                    "LEFT JOIN movies m ON s.movie_id = m.movie_id " +
+                    "LEFT JOIN theaters t ON s.theater_id = t.theater_id " +
+                    "LEFT JOIN booking_details bd ON b.booking_id = bd.booking_id " +
+                    "LEFT JOIN seats st ON bd.seat_id = st.seat_id " +
+                    "WHERE b.user_id = ? " +
+                    "GROUP BY b.booking_id, m.title, s.show_time, t.theater_name " +
+                    "ORDER BY b.created_at DESC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, userId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getInt("booking_id"));
+                    booking.setScheduleId(rs.getInt("schedule_id"));
+                    booking.setBookingCode(rs.getString("booking_code"));
+                    booking.setTotalSeats(rs.getInt("total_seats"));
+                    booking.setTotalPrice(rs.getBigDecimal("total_price"));
+                    booking.setBookingStatus(rs.getString("booking_status"));
+                    booking.setCustomerName(rs.getString("customer_name"));
+                    booking.setCustomerEmail(rs.getString("customer_email"));
+                    booking.setCustomerPhone(rs.getString("customer_phone"));
+                    booking.setCreatedAt(rs.getTimestamp("created_at"));
+                    
+                    // Additional fields from joins - handle NULL values
+                    booking.setMovieTitle(rs.getString("movie_title"));
+                    
+                    // Convert show_time timestamp to string
+                    Timestamp showTime = rs.getTimestamp("show_time");
+                    if (showTime != null) {
+                        booking.setShowtime(showTime.toString());
+                    }
+                    
+                    booking.setTheaterName(rs.getString("theater_name"));
+                    
+                    String seatCodes = rs.getString("seat_codes");
+                    if (seatCodes != null && !seatCodes.isEmpty()) {
+                        booking.setSeatCodes(List.of(seatCodes.split(", ")));
+                    }
+                    
                     bookings.add(booking);
                 }
             }

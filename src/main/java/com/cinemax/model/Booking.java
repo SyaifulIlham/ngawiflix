@@ -18,6 +18,11 @@ public class Booking {
     private Timestamp createdAt;
     private List<String> seatCodes;
     
+    // Additional fields for joined data
+    private String movieTitle;
+    private String showtime;
+    private String theaterName;
+    
     // Constructors
     public Booking() {}
     
@@ -116,5 +121,29 @@ public class Booking {
     
     public void setSeatCodes(List<String> seatCodes) {
         this.seatCodes = seatCodes;
+    }
+    
+    public String getMovieTitle() {
+        return movieTitle;
+    }
+    
+    public void setMovieTitle(String movieTitle) {
+        this.movieTitle = movieTitle;
+    }
+    
+    public String getShowtime() {
+        return showtime;
+    }
+    
+    public void setShowtime(String showtime) {
+        this.showtime = showtime;
+    }
+    
+    public String getTheaterName() {
+        return theaterName;
+    }
+    
+    public void setTheaterName(String theaterName) {
+        this.theaterName = theaterName;
     }
 }

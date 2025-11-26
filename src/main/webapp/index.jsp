@@ -187,7 +187,7 @@
                                class="block px-4 py-2 hover:bg-slate-700 transition">
                                 <i class="fas fa-user mr-2"></i> Profil
                             </a>
-                            <a href="#" @click.prevent="userMenu = false" 
+                            <a href="my-tickets.jsp"
                                class="block px-4 py-2 hover:bg-slate-700 transition">
                                 <i class="fas fa-ticket-alt mr-2"></i> Tiket Saya
                             </a>
@@ -787,6 +787,73 @@
         </div>
     </div>
     
+    <!-- Payment QR Code Modal -->
+    <div x-show="showPaymentModal" 
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+         x-transition>
+        <div class="bg-slate-900 rounded-2xl max-w-md w-full p-8 text-center"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform scale-95"
+             x-transition:enter-end="opacity-100 transform scale-100">
+            
+            <!-- Pending State - Show QR Code -->
+            <div x-show="paymentStatus === 'pending'">
+                <h3 class="text-2xl font-bold mb-6">Scan QR Code untuk Pembayaran</h3>
+                
+                <!-- QR Code Placeholder -->
+                <div class="bg-white rounded-xl p-6 mb-6 mx-auto w-64 h-64 flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-qrcode text-slate-800 text-9xl mb-2"></i>
+                        <p class="text-slate-600 text-xs">QR Code Pembayaran</p>
+                    </div>
+                </div>
+                
+                <!-- Payment Details -->
+                <div class="bg-slate-800 rounded-lg p-4 mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">Total Pembayaran:</span>
+                        <span class="font-bold text-red-500 text-xl" x-text="formatPrice(getTotalPrice())"></span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">Kursi:</span>
+                        <span class="font-semibold" x-text="selectedSeats.join(', ')"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Jumlah Tiket:</span>
+                        <span class="font-semibold" x-text="selectedSeats.length + ' tiket'"></span>
+                    </div>
+                </div>
+                
+                <!-- Countdown Timer -->
+                <div class="mb-4">
+                    <div class="flex items-center justify-center gap-2 text-gray-400">
+                        <i class="fas fa-clock"></i>
+                        <span>Memproses pembayaran dalam <span class="text-red-500 font-bold" x-text="paymentCountdown"></span> detik...</span>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-500">Scan QR Code dengan aplikasi pembayaran Anda</p>
+            </div>
+            
+            <!-- Processing State -->
+            <div x-show="paymentStatus === 'processing'" class="py-8">
+                <div class="w-20 h-20 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                <h3 class="text-2xl font-bold mb-2">Memproses Pembayaran...</h3>
+                <p class="text-gray-400">Mohon tunggu sebentar</p>
+            </div>
+            
+            <!-- Success State -->
+            <div x-show="paymentStatus === 'success'" class="py-4">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Pembayaran Berhasil!</h3>
+                <p class="text-gray-400">Pesanan Anda sedang diproses...</p>
+            </div>
+        </div>
+    </div>
+    
     <!-- Success Modal -->
     <div x-show="showSuccess" 
          x-cloak
@@ -986,11 +1053,15 @@
                 searchQuery: '',
                 selectedCategory: 'all',
                 selectedMovie: null,
+                selectedMovieId: null, // Track selected movie ID for validation
                 showSeatSelection: false,
                 showTrailer: false,
                 showSuccess: false,
                 showLoginModal: false,
+                showPaymentModal: false,
                 loginMode: 'login', // 'login' or 'register'
+                paymentStatus: 'pending', // 'pending', 'processing', 'success'
+                paymentCountdown: 10,
                 selectedSeats: [],
                 selectedSeatIds: [],
                 selectedScheduleId: null,
@@ -1126,6 +1197,7 @@
                     }
                     
                     this.selectedMovie = movie;
+                    this.selectedMovieId = movie.id; // Store movie ID for validation
                     this.showSeatSelection = false;
                     this.selectedSeats = [];
                     this.selectedSeatIds = [];
@@ -1136,6 +1208,14 @@
                     this.selectedTime = '';
                     this.availableDates = [];
                     this.availableTimes = [];
+                    this.selectedScheduleId = null;
+                    
+                    // Reset schedules immediately to prevent showing old data
+                    this.schedules = [];
+                    
+                    console.log('=== SELECTED MOVIE ===');
+                    console.log('Movie ID:', movie.id);
+                    console.log('Movie Title:', movie.title);
                     
                     // Load schedules for this movie
                     await this.loadSchedules(movie.id);
@@ -1190,24 +1270,58 @@
                 // Load schedules for a movie
                 async loadSchedules(movieId) {
                     try {
-                        console.log('Loading schedules for movieId:', movieId);
+                        // Convert to number to avoid proxy issues
+                        const numericMovieId = Number(movieId);
                         
-                        if (!movieId) {
-                            console.error('movieId is empty or undefined');
+                        console.log('Loading schedules for movieId:', numericMovieId);
+                        console.log('movieId type:', typeof numericMovieId);
+                        
+                        if (!numericMovieId || isNaN(numericMovieId)) {
+                            console.error('movieId is invalid:', movieId);
                             this.schedules = [];
+                            this.selectedScheduleId = null;
                             return;
                         }
                         
-                        const response = await fetch(`api/schedules?movieId=${movieId}`);
+                        const url = `api/schedules?movieId=${numericMovieId}`;
+                        console.log('Fetching URL:', url);
+                        console.log('URL includes movieId:', url.includes('movieId='));
+                        console.log('Numeric value being used:', numericMovieId);
+                        
+                        // Alternative URL construction to avoid template issues
+                        const apiUrl = 'api/schedules?movieId=' + String(numericMovieId);
+                        console.log('Alternative URL:', apiUrl);
+                        
+                        const response = await fetch(apiUrl);
                         
                         if (!response.ok) {
                             console.error('API response error:', response.status);
                             this.schedules = [];
+                            this.selectedScheduleId = null;
                             return;
                         }
                         
                         this.schedules = await response.json();
-                        console.log('Schedules loaded:', this.schedules);
+                        console.log('=== SCHEDULES LOADED ===');
+                        console.log('For Movie ID:', numericMovieId);
+                        console.log('Total schedules:', this.schedules.length);
+                        
+                        // Verify all schedules belong to correct movie
+                        if (this.schedules.length > 0) {
+                            const wrongSchedules = this.schedules.filter(s => s.movieId !== numericMovieId);
+                            if (wrongSchedules.length > 0) {
+                                console.error('❌ VALIDATION ERROR: Found schedules from wrong movie!');
+                                console.error('Expected movieId:', numericMovieId);
+                                console.error('Wrong schedules:', wrongSchedules);
+                                alert('Error: Jadwal yang dimuat tidak sesuai dengan film!');
+                                this.schedules = [];
+                                return;
+                            }
+                            console.log('✅ All schedules belong to movie ID:', numericMovieId);
+                        } else {
+                            console.warn('No schedules available for movieId:', numericMovieId);
+                            this.selectedScheduleId = null;
+                        }
                         
                         // Reset selected schedule - user must choose manually
                         this.selectedScheduleId = null;
@@ -1258,7 +1372,7 @@
                     }
                 },
                 
-                // Book tickets - save to database
+                // Book tickets - show payment modal
                 async bookTickets() {
                     // Check if user is logged in
                     if (!this.currentUser) {
@@ -1271,16 +1385,66 @@
                         return;
                     }
                     
+                    // Show payment modal
+                    this.showPaymentModal = true;
+                    this.paymentStatus = 'pending';
+                    this.paymentCountdown = 10;
+                    
+                    // Start countdown
+                    this.startPaymentCountdown();
+                },
+                
+                // Start payment countdown
+                startPaymentCountdown() {
+                    const interval = setInterval(() => {
+                        this.paymentCountdown--;
+                        
+                        if (this.paymentCountdown === 5) {
+                            this.paymentStatus = 'processing';
+                        }
+                        
+                        if (this.paymentCountdown <= 0) {
+                            clearInterval(interval);
+                            this.processPayment();
+                        }
+                    }, 1000);
+                },
+                
+                // Process payment and save to database
+                async processPayment() {
                     try {
+                        // CRITICAL VALIDATION: Ensure schedule matches selected movie
+                        if (this.selectedMovieId && this.selectedScheduleId) {
+                            const selectedSchedule = this.schedules.find(s => s.scheduleId === this.selectedScheduleId);
+                            if (selectedSchedule) {
+                                if (selectedSchedule.movieId !== this.selectedMovieId) {
+                                    console.error('❌ CRITICAL: Schedule does not match selected movie!');
+                                    console.error('Selected Movie ID:', this.selectedMovieId);
+                                    console.error('Selected Movie:', this.selectedMovie.title);
+                                    console.error('Schedule Movie ID:', selectedSchedule.movieId);
+                                    console.error('Schedule Movie:', selectedSchedule.movieTitle);
+                                    alert('Error: Jadwal tidak sesuai dengan film yang dipilih!\nFilm: ' + this.selectedMovie.title + '\nJadwal untuk: ' + selectedSchedule.movieTitle);
+                                    return;
+                                }
+                                console.log('✅ Validation passed: Schedule matches movie');
+                                console.log('Movie:', this.selectedMovie.title, '(ID:', this.selectedMovieId + ')');
+                                console.log('Schedule:', selectedSchedule.movieTitle, '(ID:', selectedSchedule.movieId + ')');
+                            }
+                        }
+                        
                         this.loading = true;
+                        this.paymentStatus = 'processing';
                         
                         const bookingData = {
+                            userId: this.currentUser.userId,
                             scheduleId: this.selectedScheduleId,
                             customerName: this.currentUser.fullName || this.currentUser.username,
                             customerEmail: this.currentUser.email,
                             customerPhone: this.currentUser.phone || '',
                             seatIds: this.selectedSeatIds
                         };
+                        
+                        console.log('Sending booking data:', bookingData);
                         
                         const response = await fetch('api/bookings', {
                             method: 'POST',
@@ -1290,17 +1454,29 @@
                             body: JSON.stringify(bookingData)
                         });
                         
+                        console.log('Response status:', response.status);
                         const result = await response.json();
+                        console.log('Response data:', result);
                         
                         if (result.success) {
+                            this.paymentStatus = 'success';
                             this.bookingCode = result.bookingCode;
-                            this.showSuccess = true;
+                            
+                            // Wait a bit then show success modal
+                            setTimeout(() => {
+                                this.showPaymentModal = false;
+                                this.showSuccess = true;
+                            }, 2000);
                         } else {
+                            this.paymentStatus = 'pending';
                             alert('Booking gagal: ' + (result.error || 'Unknown error'));
+                            this.showPaymentModal = false;
                         }
                     } catch (error) {
                         console.error('Error booking tickets:', error);
+                        this.paymentStatus = 'pending';
                         alert('Terjadi kesalahan saat booking. Silakan coba lagi.');
+                        this.showPaymentModal = false;
                     } finally {
                         this.loading = false;
                     }

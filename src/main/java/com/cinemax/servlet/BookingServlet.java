@@ -5,6 +5,8 @@ import com.cinemax.dao.ScheduleDAO;
 import com.cinemax.model.Booking;
 import com.cinemax.model.Schedule;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import jakarta.servlet.ServletException;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,31 +45,49 @@ public class BookingServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         try {
+            System.out.println("=== Booking Request Started ===");
+            
             // Read JSON from request body
             BufferedReader reader = request.getReader();
-            JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
+            String jsonBody = reader.lines().collect(Collectors.joining());
+            System.out.println("Request body: " + jsonBody);
             
+            JsonObject jsonObject = gson.fromJson(jsonBody, JsonObject.class);
+            
+            int userId = jsonObject.has("userId") ? jsonObject.get("userId").getAsInt() : 0;
             int scheduleId = jsonObject.get("scheduleId").getAsInt();
             String customerName = jsonObject.get("customerName").getAsString();
             String customerEmail = jsonObject.get("customerEmail").getAsString();
             String customerPhone = jsonObject.get("customerPhone").getAsString();
             
-            List<Integer> seatIds = gson.fromJson(jsonObject.get("seatIds"), List.class)
-                    .stream()
-                    .map(obj -> ((Double) obj).intValue())
-                    .collect(Collectors.toList());
+            System.out.println("User ID: " + userId);
+            System.out.println("Schedule ID: " + scheduleId);
+            System.out.println("Customer: " + customerName + " (" + customerEmail + ")");
+            
+            // Parse seat IDs from JsonArray
+            List<Integer> seatIds = new ArrayList<>();
+            JsonArray seatArray = jsonObject.getAsJsonArray("seatIds");
+            for (JsonElement element : seatArray) {
+                seatIds.add(element.getAsInt());
+            }
+            
+            System.out.println("Seat IDs: " + seatIds);
             
             // Get schedule to calculate price
             Schedule schedule = scheduleDAO.getScheduleById(scheduleId);
             
             if (schedule == null) {
+                System.out.println("ERROR: Schedule not found for ID: " + scheduleId);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"error\": \"Schedule not found\"}");
+                out.print("{\"success\": false, \"error\": \"Schedule not found\"}");
                 return;
             }
             
+            System.out.println("Schedule found. Price: " + schedule.getPrice());
+            
             // Create booking object
             Booking booking = new Booking();
+            booking.setUserId(userId);
             booking.setScheduleId(scheduleId);
             booking.setCustomerName(customerName);
             booking.setCustomerEmail(customerEmail);
@@ -74,8 +95,14 @@ public class BookingServlet extends HttpServlet {
             booking.setTotalSeats(seatIds.size());
             booking.setTotalPrice(schedule.getPrice().multiply(new BigDecimal(seatIds.size())));
             
+            System.out.println("Total seats: " + seatIds.size());
+            System.out.println("Total price: " + booking.getTotalPrice());
+            
             // Save booking
             String bookingCode = bookingDAO.createBooking(booking, seatIds);
+            
+            System.out.println("Booking created successfully. Code: " + bookingCode);
+            System.out.println("=== Booking Request Completed ===");
             
             // Return booking code
             JsonObject result = new JsonObject();
@@ -86,12 +113,21 @@ public class BookingServlet extends HttpServlet {
             out.print(gson.toJson(result));
             
         } catch (SQLException e) {
+            System.err.println("SQL ERROR: " + e.getMessage());
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             JsonObject error = new JsonObject();
             error.addProperty("success", false);
-            error.addProperty("error", e.getMessage());
+            error.addProperty("error", "Database error: " + e.getMessage());
             out.print(gson.toJson(error));
+        } catch (Exception e) {
+            System.err.println("GENERAL ERROR: " + e.getMessage());
             e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JsonObject error = new JsonObject();
+            error.addProperty("success", false);
+            error.addProperty("error", "Error: " + e.getMessage());
+            out.print(gson.toJson(error));
         }
     }
     
@@ -106,19 +142,51 @@ public class BookingServlet extends HttpServlet {
         try {
             String bookingCode = request.getParameter("bookingCode");
             String email = request.getParameter("email");
+            String userIdParam = request.getParameter("userId");
+            
+            System.out.println("=== Get Bookings Request ===");
+            System.out.println("Booking Code: " + bookingCode);
+            System.out.println("Email: " + email);
+            System.out.println("User ID: " + userIdParam);
             
             if (bookingCode != null) {
                 Booking booking = bookingDAO.getBookingByCode(bookingCode);
+                System.out.println("Found booking: " + (booking != null ? booking.getBookingCode() : "null"));
                 out.print(gson.toJson(booking));
+            } else if (userIdParam != null) {
+                int userId = Integer.parseInt(userIdParam);
+                List<Booking> bookings = bookingDAO.getBookingsByUserId(userId);
+                System.out.println("Found " + bookings.size() + " bookings for user ID: " + userId);
+                for (Booking b : bookings) {
+                    System.out.println("  - " + b.getBookingCode() + " | " + b.getMovieTitle() + " | " + b.getCustomerEmail());
+                }
+                out.print(gson.toJson(bookings));
             } else if (email != null) {
                 List<Booking> bookings = bookingDAO.getBookingsByEmail(email);
+                System.out.println("Found " + bookings.size() + " bookings for email: " + email);
+                for (Booking b : bookings) {
+                    System.out.println("  - " + b.getBookingCode() + " | " + b.getMovieTitle() + " | " + b.getCustomerEmail());
+                }
                 out.print(gson.toJson(bookings));
+            } else {
+                System.out.println("No bookingCode, email, or userId parameter provided");
+                out.print("[]");
             }
             
         } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"error\": \"" + e.getMessage() + "\"}");
+            System.err.println("SQL Error in doGet: " + e.getMessage());
             e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JsonObject error = new JsonObject();
+            error.addProperty("error", e.getMessage());
+            out.print(gson.toJson(error));
+        } catch (Exception e) {
+            System.err.println("General Error in doGet: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JsonObject error = new JsonObject();
+            error.addProperty("error", e.getMessage());
+            out.print(gson.toJson(error));
         }
     }
 }
