@@ -89,12 +89,19 @@ public class BookingDAO {
     
     public Booking getBookingByCode(String bookingCode) throws SQLException {
         String sql = "SELECT b.*, " +
+                    "m.title as movie_title, " +
+                    "s.show_date, " +
+                    "s.show_time, " +
+                    "t.theater_name, " +
                     "STRING_AGG(s.row_letter || s.seat_number, ', ' ORDER BY s.row_letter, s.seat_number) as seat_codes " +
                     "FROM bookings b " +
+                    "LEFT JOIN schedules s ON b.schedule_id = s.schedule_id " +
+                    "LEFT JOIN movies m ON s.movie_id = m.movie_id " +
+                    "LEFT JOIN theaters t ON s.theater_id = t.theater_id " +
                     "LEFT JOIN booking_details bd ON b.booking_id = bd.booking_id " +
-                    "LEFT JOIN seats s ON bd.seat_id = s.seat_id " +
+                    "LEFT JOIN seats st ON bd.seat_id = st.seat_id " +
                     "WHERE b.booking_code = ? " +
-                    "GROUP BY b.booking_id";
+                    "GROUP BY b.booking_id, m.title, s.show_date, s.show_time, t.theater_name";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -115,8 +122,22 @@ public class BookingDAO {
                     booking.setCustomerPhone(rs.getString("customer_phone"));
                     booking.setCreatedAt(rs.getTimestamp("created_at"));
                     
+                    // Additional fields from joins
+                    booking.setMovieTitle(rs.getString("movie_title"));
+                    booking.setTheaterName(rs.getString("theater_name"));
+                    
+                    // Format show_date and show_time properly
+                    Date showDate = rs.getDate("show_date");
+                    Time showTime = rs.getTime("show_time");
+                    if (showDate != null && showTime != null) {
+                        String formattedDateTime = formatShowDateTime(showDate, showTime);
+                        booking.setShowtime(formattedDateTime);
+                    } else if (showTime != null) {
+                        booking.setShowtime(showTime.toString().substring(0, 5));
+                    }
+                    
                     String seatCodes = rs.getString("seat_codes");
-                    if (seatCodes != null) {
+                    if (seatCodes != null && !seatCodes.isEmpty()) {
                         booking.setSeatCodes(List.of(seatCodes.split(", ")));
                     }
                     
@@ -132,6 +153,7 @@ public class BookingDAO {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT b.*, " +
                     "m.title as movie_title, " +
+                    "s.show_date, " +
                     "s.show_time, " +
                     "t.theater_name, " +
                     "STRING_AGG(st.row_letter || st.seat_number, ', ' ORDER BY st.row_letter, st.seat_number) as seat_codes " +
@@ -142,7 +164,7 @@ public class BookingDAO {
                     "LEFT JOIN booking_details bd ON b.booking_id = bd.booking_id " +
                     "LEFT JOIN seats st ON bd.seat_id = st.seat_id " +
                     "WHERE b.customer_email = ? " +
-                    "GROUP BY b.booking_id, m.title, s.show_time, t.theater_name " +
+                    "GROUP BY b.booking_id, m.title, s.show_date, s.show_time, t.theater_name " +
                     "ORDER BY b.created_at DESC";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -167,10 +189,16 @@ public class BookingDAO {
                     // Additional fields from joins - handle NULL values
                     booking.setMovieTitle(rs.getString("movie_title"));
                     
-                    // Convert show_time timestamp to string
-                    Timestamp showTime = rs.getTimestamp("show_time");
-                    if (showTime != null) {
-                        booking.setShowtime(showTime.toString());
+                    // Format show_date and show_time properly
+                    Date showDate = rs.getDate("show_date");
+                    Time showTime = rs.getTime("show_time");
+                    if (showDate != null && showTime != null) {
+                        // Format as "dd MMMM yyyy pukul HH:mm"
+                        String formattedDateTime = formatShowDateTime(showDate, showTime);
+                        booking.setShowtime(formattedDateTime);
+                    } else if (showTime != null) {
+                        // Fallback to time only if date is missing
+                        booking.setShowtime(showTime.toString().substring(0, 5)); // HH:mm format
                     }
                     
                     booking.setTheaterName(rs.getString("theater_name"));
@@ -192,6 +220,7 @@ public class BookingDAO {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT b.*, " +
                     "m.title as movie_title, " +
+                    "s.show_date, " +
                     "s.show_time, " +
                     "t.theater_name, " +
                     "STRING_AGG(st.row_letter || st.seat_number, ', ' ORDER BY st.row_letter, st.seat_number) as seat_codes " +
@@ -202,7 +231,7 @@ public class BookingDAO {
                     "LEFT JOIN booking_details bd ON b.booking_id = bd.booking_id " +
                     "LEFT JOIN seats st ON bd.seat_id = st.seat_id " +
                     "WHERE b.user_id = ? " +
-                    "GROUP BY b.booking_id, m.title, s.show_time, t.theater_name " +
+                    "GROUP BY b.booking_id, m.title, s.show_date, s.show_time, t.theater_name " +
                     "ORDER BY b.created_at DESC";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -227,10 +256,16 @@ public class BookingDAO {
                     // Additional fields from joins - handle NULL values
                     booking.setMovieTitle(rs.getString("movie_title"));
                     
-                    // Convert show_time timestamp to string
-                    Timestamp showTime = rs.getTimestamp("show_time");
-                    if (showTime != null) {
-                        booking.setShowtime(showTime.toString());
+                    // Format show_date and show_time properly
+                    Date showDate = rs.getDate("show_date");
+                    Time showTime = rs.getTime("show_time");
+                    if (showDate != null && showTime != null) {
+                        // Format as "dd MMMM yyyy pukul HH:mm"
+                        String formattedDateTime = formatShowDateTime(showDate, showTime);
+                        booking.setShowtime(formattedDateTime);
+                    } else if (showTime != null) {
+                        // Fallback to time only if date is missing
+                        booking.setShowtime(showTime.toString().substring(0, 5)); // HH:mm format
                     }
                     
                     booking.setTheaterName(rs.getString("theater_name"));
@@ -246,6 +281,21 @@ public class BookingDAO {
         }
         
         return bookings;
+    }
+    
+    private String formatShowDateTime(Date showDate, Time showTime) {
+        if (showDate == null || showTime == null) {
+            return "";
+        }
+        
+        // Format date as "dd MMMM yyyy"
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("d MMMM yyyy", new java.util.Locale("id", "ID"));
+        String dateStr = dateFormat.format(showDate);
+        
+        // Format time as "HH:mm"
+        String timeStr = showTime.toString().substring(0, 5);
+        
+        return dateStr + " pukul " + timeStr;
     }
     
     private String generateBookingCode() {

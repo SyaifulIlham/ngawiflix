@@ -45,11 +45,7 @@
                         <i class="fas fa-film w-5"></i>
                         <span>Movies</span>
                     </a>
-                    <a href="schedules.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-calendar w-5"></i>
-                        <span>Schedules</span>
-                    </a>
-                    <a href="theaters.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
+                    <a href="admin/theaters.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
                         <i class="fas fa-building w-5"></i>
                         <span>Theaters</span>
                     </a>

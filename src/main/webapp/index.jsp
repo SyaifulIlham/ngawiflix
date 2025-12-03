@@ -338,11 +338,11 @@
                         :class="selectedCategory === 'all' ? 'bg-red-600' : 'bg-slate-800 hover:bg-slate-700'">
                     Semua
                 </button>
-                <template x-for="category in categories" :key="category">
-                    <button @click="selectedCategory = category; filterMovies()"
+                <template x-for="category in categories" :key="category.categoryId">
+                    <button @click="selectedCategory = category.categoryName; filterMovies()"
                             class="px-6 py-2 rounded-full font-semibold transition capitalize"
-                            :class="selectedCategory === category ? 'bg-red-600' : 'bg-slate-800 hover:bg-slate-700'"
-                            x-text="category">
+                            :class="selectedCategory === category.categoryName ? 'bg-red-600' : 'bg-slate-800 hover:bg-slate-700'"
+                            x-text="category.categoryName">
                     </button>
                 </template>
             </div>
@@ -921,6 +921,37 @@
         </div>
     </div>
     
+    <!-- Toast Notification -->
+    <div x-show="toast.show" 
+         x-cloak
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-x-full"
+         x-transition:enter-end="opacity-100 transform translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform translate-x-0"
+         x-transition:leave-end="opacity-0 transform translate-x-full"
+         class="fixed bottom-4 right-4 z-50 max-w-sm w-full">
+        <div class="rounded-lg shadow-lg p-4 flex items-center gap-3"
+             :class="{
+                 'bg-green-500': toast.type === 'success',
+                 'bg-red-500': toast.type === 'error',
+                 'bg-blue-500': toast.type === 'info',
+                 'bg-yellow-500': toast.type === 'warning'
+             }">
+            <i class="fas text-white text-xl"
+               :class="{
+                   'fa-check-circle': toast.type === 'success',
+                   'fa-exclamation-circle': toast.type === 'error',
+                   'fa-info-circle': toast.type === 'info',
+                   'fa-exclamation-triangle': toast.type === 'warning'
+               }"></i>
+            <p class="text-white font-medium flex-1" x-text="toast.message"></p>
+            <button @click="toast.show = false" class="text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
     <!-- Login/Register Modal -->
     <div x-show="showLoginModal" 
          x-cloak
@@ -1115,6 +1146,13 @@
                 // Auth
                 currentUser: null,
                 
+                // Toast notification
+                toast: {
+                    show: false,
+                    message: '',
+                    type: 'success' // 'success', 'error', 'info', 'warning'
+                },
+                
                 // Step-by-step schedule selection
                 selectedTheater: '',
                 selectedDate: '',
@@ -1275,9 +1313,20 @@
                         return;
                     }
                     
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+                    
                     const dates = [...new Set(
                         this.schedules
-                            .filter(s => s.theaterName === this.selectedTheater)
+                            .filter(s => {
+                                if (s.theaterName !== this.selectedTheater) return false;
+                                
+                                // Filter out past dates
+                                const scheduleDate = new Date(s.showDate);
+                                scheduleDate.setHours(0, 0, 0, 0);
+                                
+                                return scheduleDate >= today;
+                            })
                             .map(s => s.showDate)
                     )];
                     
@@ -1291,8 +1340,33 @@
                         return;
                     }
                     
+                    const now = new Date();
+                    const selectedDateObj = new Date(this.selectedDate);
+                    selectedDateObj.setHours(0, 0, 0, 0);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    // Check if selected date is today
+                    const isToday = selectedDateObj.getTime() === today.getTime();
+                    
                     this.availableTimes = this.schedules
-                        .filter(s => s.theaterName === this.selectedTheater && s.showDate === this.selectedDate)
+                        .filter(s => {
+                            if (s.theaterName !== this.selectedTheater || s.showDate !== this.selectedDate) {
+                                return false;
+                            }
+                            
+                            // If selected date is today, filter out past times
+                            if (isToday) {
+                                const scheduleTime = s.showTime.split(':');
+                                const scheduleDateTime = new Date();
+                                scheduleDateTime.setHours(parseInt(scheduleTime[0]), parseInt(scheduleTime[1]), 0, 0);
+                                
+                                return scheduleDateTime > now;
+                            }
+                            
+                            // If selected date is in the future, show all times
+                            return true;
+                        })
                         .sort((a, b) => a.showTime.localeCompare(b.showTime));
                 },
                 
@@ -1640,9 +1714,9 @@
                         if (result.success) {
                             this.currentUser = result.user;
                             this.showLoginModal = false;
-                            // alert('Login berhasil! Selamat datang ' + (result.user.fullName || result.user.username));
+                            this.showToast('success', 'Login berhasil! Selamat datang ' + (result.user.fullName || result.user.username));
                         } else {
-                            alert(result.error || 'Login gagal');
+                            this.showToast('error', result.error || 'Login gagal');
                         }
                         
                         return result.success;
@@ -1682,15 +1756,15 @@
                         if (result.success) {
                             this.currentUser = result.user;
                             this.showLoginModal = false;
-                            alert('Registrasi berhasil! Selamat datang ' + (result.user.fullName || result.user.username));
+                            this.showToast('success', 'Registrasi berhasil! Selamat datang ' + (result.user.fullName || result.user.username));
                         } else {
-                            alert(result.error || 'Registrasi gagal');
+                            this.showToast('error', result.error || 'Registrasi gagal');
                         }
                         
                         return result.success;
                     } catch (error) {
                         console.error('Error registering:', error);
-                        alert('Terjadi kesalahan saat registrasi');
+                        this.showToast('error', 'Terjadi kesalahan saat registrasi');
                         return false;
                     } finally {
                         this.loading = false;
@@ -1699,9 +1773,6 @@
                 
                 // Logout
                 async logout() {
-                    if (!confirm('Apakah Anda yakin ingin keluar?')) {
-                        return;
-                    }
                     
                     try {
                         const response = await fetch('api/auth?action=logout', {
@@ -1712,7 +1783,7 @@
                         
                         if (result.success) {
                             this.currentUser = null;
-                            alert('Logout berhasil');
+                            this.showToast('success', 'Logout berhasil');
                             
                             // Reset any active booking
                             this.resetBooking();
@@ -1720,8 +1791,20 @@
                         }
                     } catch (error) {
                         console.error('Error logging out:', error);
-                        alert('Terjadi kesalahan saat logout');
+                        this.showToast('error', 'Terjadi kesalahan saat logout');
                     }
+                },
+                
+                // Toast notification
+                showToast(type, message) {
+                    this.toast.type = type;
+                    this.toast.message = message;
+                    this.toast.show = true;
+                    
+                    // Auto hide after 3 seconds
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 3000);
                 }
             }
         }

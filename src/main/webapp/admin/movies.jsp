@@ -45,10 +45,6 @@
                         <i class="fas fa-film w-5"></i>
                         <span>Movies</span>
                     </a>
-                    <a href="schedules.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-calendar w-5"></i>
-                        <span>Schedules</span>
-                    </a>
                     <a href="theaters.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
                         <i class="fas fa-building w-5"></i>
                         <span>Theaters</span>
@@ -100,7 +96,7 @@
                                 class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                             <option value="">All Categories</option>
                             <template x-for="category in categories" :key="category.categoryId">
-                                <option :value="category.categoryId" x-text="category.name"></option>
+                                <option :value="category.categoryId" x-text="category.categoryName"></option>
                             </template>
                         </select>
                     </div>
@@ -166,6 +162,11 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="flex gap-2">
+                                                <button @click="viewMovieDetail(movie)" 
+                                                        class="text-green-600 hover:text-green-800" 
+                                                        title="View Details & Manage Schedules">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
                                                 <button @click="openEditModal(movie)" 
                                                         class="text-blue-600 hover:text-blue-800">
                                                     <i class="fas fa-edit"></i>
@@ -280,12 +281,28 @@
                                 <!-- Trailer Preview -->
                                 <div x-show="formData.trailerUrl && trailerEmbedUrl" class="mt-3">
                                     <p class="text-xs font-medium text-gray-700 mb-2">Preview:</p>
-                                    <iframe :src="trailerEmbedUrl" 
-                                            class="w-full h-48 rounded-lg border"
-                                            frameborder="0" 
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                            allowfullscreen>
-                                    </iframe>
+                                    <div class="relative w-full h-48 rounded-lg border overflow-hidden bg-gray-100">
+                                        <iframe :key="trailerEmbedUrl"
+                                                :src="trailerEmbedUrl" 
+                                                class="w-full h-full"
+                                                frameborder="0" 
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                                allowfullscreen
+                                                loading="lazy"
+                                                referrerpolicy="strict-origin-when-cross-origin"
+                                                title="Movie Trailer Preview">
+                                        </iframe>
+                                    </div>
+                                    <p x-show="formData.trailerUrl && !trailerEmbedUrl" class="text-xs text-red-500 mt-1">
+                                        Format URL tidak valid. Gunakan format: https://youtube.com/watch?v=... atau https://youtu.be/...
+                                    </p>
+                                    <div x-show="formData.trailerUrl && trailerEmbedUrl" class="mt-2">
+                                        <a :href="formData.trailerUrl" target="_blank" 
+                                           class="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                                            <i class="fas fa-external-link-alt"></i>
+                                            <span>Buka trailer di YouTube (jika preview tidak muncul)</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -297,7 +314,7 @@
                                             <input type="checkbox" :value="category.categoryId" 
                                                    x-model="formData.categories"
                                                    class="rounded text-red-600 focus:ring-red-500">
-                                            <span x-text="category.name"></span>
+                                            <span x-text="category.categoryName"></span>
                                         </label>
                                     </template>
                                 </div>
@@ -356,6 +373,37 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Toast Notification -->
+        <div x-show="toast.show" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform translate-x-full"
+             x-transition:enter-end="opacity-100 transform translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform translate-x-0"
+             x-transition:leave-end="opacity-0 transform translate-x-full"
+             class="fixed top-4 right-4 z-50 max-w-sm w-full"
+             style="display: none;">
+            <div class="rounded-lg shadow-lg p-4 flex items-center gap-3"
+                 :class="{
+                     'bg-green-500': toast.type === 'success',
+                     'bg-red-500': toast.type === 'error',
+                     'bg-blue-500': toast.type === 'info',
+                     'bg-yellow-500': toast.type === 'warning'
+                 }">
+                <i class="fas text-white text-xl"
+                   :class="{
+                       'fa-check-circle': toast.type === 'success',
+                       'fa-exclamation-circle': toast.type === 'error',
+                       'fa-info-circle': toast.type === 'info',
+                       'fa-exclamation-triangle': toast.type === 'warning'
+                   }"></i>
+                <p class="text-white font-medium flex-1" x-text="toast.message"></p>
+                <button @click="toast.show = false" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -372,6 +420,11 @@
                 filterCategory: '',
                 movieToDelete: null,
                 trailerEmbedUrl: '',
+                toast: {
+                    show: false,
+                    message: '',
+                    type: 'success'
+                },
                 formData: {
                     movieId: null,
                     title: '',
@@ -402,7 +455,7 @@
                         this.filteredMovies = this.movies;
                     } catch (error) {
                         console.error('Error loading movies:', error);
-                        alert('Failed to load movies');
+                        this.showToast('error', 'Gagal memuat data movies');
                     } finally {
                         this.loading = false;
                     }
@@ -466,8 +519,11 @@
                         isFeatured: movie.isFeatured || false,
                         categories: movie.categories || []
                     };
-                    this.updateTrailerPreview();
                     this.showModal = true;
+                    // Use $nextTick to ensure modal is rendered before updating preview
+                    this.$nextTick(() => {
+                        this.updateTrailerPreview();
+                    });
                 },
 
                 closeModal() {
@@ -487,21 +543,66 @@
                     console.log('Preview URL:', url);
                     
                     // Extract YouTube video ID from various formats
-                    if (url.includes('youtube.com/watch?v=')) {
-                        videoId = url.split('v=')[1]?.split('&')[0];
-                    } else if (url.includes('youtu.be/')) {
-                        videoId = url.split('youtu.be/')[1]?.split('?')[0];
-                    } else if (url.includes('youtube.com/embed/')) {
-                        videoId = url.split('embed/')[1]?.split('?')[0];
+                    // Try multiple patterns to handle all YouTube URL formats
+                    
+                    // Pattern 1: youtube.com/watch?v=VIDEO_ID or youtube.com/watch?vi=VIDEO_ID
+                    let match = url.match(/(?:youtube\.com\/watch\?)(?:.*&)?v=([a-zA-Z0-9_-]{11})/);
+                    if (match && match[1]) {
+                        videoId = match[1];
+                    }
+                    
+                    // Pattern 2: youtu.be/VIDEO_ID
+                    if (!videoId) {
+                        match = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+                        if (match && match[1]) {
+                            videoId = match[1];
+                        }
+                    }
+                    
+                    // Pattern 3: youtube.com/embed/VIDEO_ID
+                    if (!videoId) {
+                        match = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
+                        if (match && match[1]) {
+                            videoId = match[1];
+                        }
+                    }
+                    
+                    // Pattern 4: youtube.com/v/VIDEO_ID
+                    if (!videoId) {
+                        match = url.match(/youtube\.com\/v\/([a-zA-Z0-9_-]{11})/);
+                        if (match && match[1]) {
+                            videoId = match[1];
+                        }
+                    }
+                    
+                    // Pattern 5: Direct video ID (11 characters)
+                    if (!videoId) {
+                        match = url.match(/^([a-zA-Z0-9_-]{11})$/);
+                        if (match && match[1]) {
+                            videoId = match[1];
+                        }
+                    }
+                    
+                    // Clean and validate video ID
+                    if (videoId) {
+                        videoId = videoId.trim();
+                        // Ensure it contains only valid characters and is exactly 11 characters
+                        if (!/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+                            console.warn('Invalid video ID format:', videoId);
+                            videoId = '';
+                        }
                     }
                     
                     console.log('Extracted video ID:', videoId);
                     
-                    if (videoId) {
-                        this.trailerEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
+                    if (videoId && videoId.length === 11) {
+                        // Use YouTube embed URL with proper parameters
+                        // Remove origin parameter as it might cause issues
+                        this.trailerEmbedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1`;
+                        console.log('Embed URL:', this.trailerEmbedUrl);
                     } else {
                         this.trailerEmbedUrl = '';
-                        console.warn('Invalid YouTube URL format');
+                        console.warn('Invalid YouTube URL format or video ID. URL:', url);
                     }
                 },
 
@@ -545,12 +646,12 @@
                             throw new Error('Failed to save movie');
                         }
 
-                        alert(this.isEditMode ? 'Movie updated successfully' : 'Movie added successfully');
+                        this.showToast('success', this.isEditMode ? 'Movie berhasil diperbarui' : 'Movie berhasil ditambahkan');
                         this.closeModal();
                         this.loadMovies();
                     } catch (error) {
                         console.error('Error saving movie:', error);
-                        alert('Failed to save movie');
+                        this.showToast('error', 'Gagal menyimpan movie');
                     }
                 },
 
@@ -569,14 +670,27 @@
                             throw new Error('Failed to delete movie');
                         }
 
-                        alert('Movie deleted successfully');
+                        this.showToast('success', 'Movie berhasil dihapus');
                         this.showDeleteModal = false;
                         this.movieToDelete = null;
                         this.loadMovies();
                     } catch (error) {
                         console.error('Error deleting movie:', error);
-                        alert('Failed to delete movie');
+                        this.showToast('error', 'Gagal menghapus movie');
                     }
+                },
+
+                viewMovieDetail(movie) {
+                    window.location.href = "movie-detail.jsp?movieId=" + movie.movieId;
+                },
+
+                showToast(type, message) {
+                    this.toast.type = type;
+                    this.toast.message = message;
+                    this.toast.show = true;
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 3000);
                 },
 
                 logout() {
