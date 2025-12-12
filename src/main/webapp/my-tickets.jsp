@@ -8,6 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- QR Code Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         [x-cloak] { display: none !important; }
         
@@ -78,7 +82,7 @@
                     <!-- Logo -->
                     <a href="index.jsp" class="flex items-center space-x-2">
                         <i class="fas fa-film text-3xl text-red-600"></i>
-                        <span class="text-2xl font-bold">Cinema<span class="text-red-600">X</span></span>
+                        <span class="text-2xl font-bold">Anjay<span class="text-red-600">Nobar</span></span>
                     </a>
                     
                     <!-- User Menu -->
@@ -384,28 +388,179 @@
                 },
                 
                 downloadTicket(ticket) {
-                    // Simple implementation - you can enhance this with actual PDF generation
-                    const content = 'CINEMEX - E-TICKET\n' +
-                        '==================\n\n' +
-                        'Kode Booking: ' + ticket.bookingCode + '\n' +
-                        'Film: ' + (ticket.movieTitle || '-') + '\n' +
-                        'Kursi: ' + (ticket.seatCodes ? ticket.seatCodes.join(', ') : '-') + '\n' +
-                        'Jumlah Tiket: ' + ticket.totalSeats + '\n' +
-                        'Total: ' + this.formatPrice(ticket.totalPrice) + '\n' +
-                        'Status: ' + this.getStatusText(ticket.bookingStatus) + '\n\n' +
-                        'Nama: ' + ticket.customerName + '\n' +
-                        'Email: ' + ticket.customerEmail + '\n' +
-                        'Telepon: ' + (ticket.customerPhone || '-') + '\n\n' +
-                        'Tanggal Pemesanan: ' + this.formatDate(ticket.createdAt) + '\n\n' +
-                        'Tunjukkan kode booking ini di loket bioskop.';
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'mm',
+                        format: [100, 200] // Ticket size
+                    });
                     
-                    const blob = new Blob([content], { type: 'text/plain' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'Ticket-' + ticket.bookingCode + '.txt';
-                    a.click();
-                    window.URL.revokeObjectURL(url);
+                    // Background
+                    doc.setFillColor(255, 255, 255);
+                    doc.rect(0, 0, 200, 100, 'F');
+                    
+                    // Header with brand color
+                    doc.setFillColor(220, 38, 38); // Red color
+                    doc.rect(0, 0, 200, 25, 'F');
+                    
+                    // Brand Name
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(24);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('ANJAYNOBAR', 10, 15);
+                    
+                    // Ticket Title
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    doc.text('E-TICKET', 170, 15);
+                    
+                    // Divider line
+                    doc.setDrawColor(220, 38, 38);
+                    doc.setLineWidth(0.5);
+                    doc.line(10, 27, 190, 27);
+                    
+                    // Movie Title
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFontSize(16);
+                    doc.setFont(undefined, 'bold');
+                    const movieTitle = ticket.movieTitle || 'Movie Title';
+                    doc.text(movieTitle, 10, 36);
+                    
+                    // Booking Code
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    doc.text('Kode Booking', 10, 44);
+                    doc.setFontSize(16);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(220, 38, 38);
+                    doc.text(ticket.bookingCode, 10, 51);
+                    
+                    // Left Column - Details
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFontSize(9);
+                    doc.setFont(undefined, 'normal');
+                    
+                    let yPos = 60;
+                    const leftCol = 10;
+                    const lineHeight = 7;
+                    
+                    // Date
+                    doc.setFont(undefined, 'bold');
+                    doc.text('TANGGAL', leftCol, yPos);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(ticket.showDate || '-', leftCol, yPos + 4);
+                    
+                    // Time
+                    yPos += lineHeight + 4;
+                    doc.setFont(undefined, 'bold');
+                    doc.text('WAKTU', leftCol, yPos);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(ticket.showtime || '-', leftCol, yPos + 4);
+                    
+                    // Theater
+                    yPos += lineHeight + 4;
+                    doc.setFont(undefined, 'bold');
+                    doc.text('BIOSKOP', leftCol, yPos);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(ticket.theaterName || 'AnjayNobar Theater', leftCol, yPos + 4);
+                    
+                    // Middle Column
+                    const midCol = 70;
+                    yPos = 60;
+                    
+                    // Seats
+                    doc.setFont(undefined, 'bold');
+                    doc.text('KURSI', midCol, yPos);
+                    doc.setFont(undefined, 'normal');
+                    const seats = ticket.seatCodes ? ticket.seatCodes.join(', ') : '-';
+                    doc.text(seats, midCol, yPos + 4);
+                    
+                    // Quantity
+                    yPos += lineHeight + 4;
+                    doc.setFont(undefined, 'bold');
+                    doc.text('JUMLAH TIKET', midCol, yPos);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(String(ticket.totalSeats || 1), midCol, yPos + 4);
+                    
+                    // Price
+                    yPos += lineHeight + 4;
+                    doc.setFont(undefined, 'bold');
+                    doc.text('TOTAL HARGA', midCol, yPos);
+                    doc.setFont(undefined, 'normal');
+                    doc.setTextColor(220, 38, 38);
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(this.formatPrice(ticket.totalPrice), midCol, yPos + 4);
+                    
+                    // QR Code on the right
+                    const qrSize = 35;
+                    const qrX = 155;
+                    const qrY = 50;
+                    
+                    // Generate QR Code
+                    try {
+                        // Create temporary div for QR code
+                        const qrDiv = document.createElement('div');
+                        qrDiv.style.display = 'none';
+                        document.body.appendChild(qrDiv);
+                        
+                        const qr = new QRCode(qrDiv, {
+                            text: ticket.bookingCode,
+                            width: 128,
+                            height: 128
+                        });
+                        
+                        // Wait a bit for QR code to generate
+                        setTimeout(() => {
+                            const qrImg = qrDiv.querySelector('img');
+                            if (qrImg) {
+                                doc.addImage(qrImg.src, 'PNG', qrX, qrY, qrSize, qrSize);
+                            }
+                            document.body.removeChild(qrDiv);
+                            
+                            // QR Label
+                            doc.setTextColor(0, 0, 0);
+                            doc.setFontSize(7);
+                            doc.setFont(undefined, 'normal');
+                            doc.text('Scan QR Code', qrX + qrSize/2, qrY + qrSize + 3, { align: 'center' });
+                            
+                            // Footer
+                            doc.setDrawColor(220, 38, 38);
+                            doc.setLineWidth(0.3);
+                            doc.line(10, 93, 190, 93);
+                            
+                            doc.setFontSize(7);
+                            doc.setTextColor(100, 100, 100);
+                            const footerText = 'Tunjukkan tiket ini di loket bioskop • ' + this.formatDate(ticket.createdAt);
+                            doc.text(footerText, 100, 97, { align: 'center' });
+                            
+                            // Save PDF
+                            doc.save('Tiket-' + ticket.bookingCode + '.pdf');
+                        }, 100);
+                    } catch (error) {
+                        console.error('Error generating QR code:', error);
+                        
+                        // If QR fails, draw a placeholder
+                        doc.setDrawColor(200, 200, 200);
+                        doc.setLineWidth(0.5);
+                        doc.rect(qrX, qrY, qrSize, qrSize);
+                        doc.setFontSize(8);
+                        doc.setTextColor(150, 150, 150);
+                        doc.text(ticket.bookingCode, qrX + qrSize/2, qrY + qrSize/2, { align: 'center' });
+                        
+                        // Footer
+                        doc.setDrawColor(220, 38, 38);
+                        doc.setLineWidth(0.3);
+                        doc.line(10, 93, 190, 93);
+                        
+                        doc.setFontSize(7);
+                        doc.setTextColor(100, 100, 100);
+                        const footerText = 'Tunjukkan tiket ini di loket bioskop • ' + this.formatDate(ticket.createdAt);
+                        doc.text(footerText, 100, 97, { align: 'center' });
+                        
+                        // Save PDF
+                        doc.save('Tiket-' + ticket.bookingCode + '.pdf');
+                    }
                 },
                 
                 async logout() {

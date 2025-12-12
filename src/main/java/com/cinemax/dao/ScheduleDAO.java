@@ -32,6 +32,28 @@ public class ScheduleDAO {
         return schedules;
     }
     
+    // For admin - get all schedules including past ones
+    public List<Schedule> getAllSchedulesByMovieId(int movieId) throws SQLException {
+        List<Schedule> schedules = new ArrayList<>();
+        String sql = "SELECT * FROM v_schedule_details WHERE movie_id = ? " +
+                     "ORDER BY show_date DESC, show_time DESC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, movieId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Schedule schedule = extractScheduleFromResultSet(rs);
+                    schedules.add(schedule);
+                }
+            }
+        }
+        
+        return schedules;
+    }
+    
     public Schedule getScheduleById(int scheduleId) throws SQLException {
         String sql = "SELECT * FROM v_schedule_details WHERE schedule_id = ?";
         

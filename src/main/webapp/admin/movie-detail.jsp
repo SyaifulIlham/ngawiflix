@@ -24,51 +24,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Detail - CinemaX Admin</title>
+    <title>Movie Detail - AnjayNobar Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body { background: #f8f9fa; }
+        .sidebar-link { transition: all 0.3s ease; }
+        .sidebar-link:hover { transform: translateX(5px); }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div x-data="movieDetailAdmin()" class="flex h-screen">
+<body>
+    <div x-data="movieDetailAdmin()" class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-            <div class="p-6">
-                <div class="flex items-center gap-3 mb-8">
-                    <i class="fas fa-film text-red-500 text-2xl"></i>
-                    <div>
-                        <h1 class="text-xl font-bold">CinemaX</h1>
-                        <p class="text-sm text-gray-400">Admin Panel</p>
+        <div class="w-72 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl">
+            <div class="p-6 h-full flex flex-col">
+                <div class="mb-8 pb-6 border-b border-slate-700">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-film text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AnjayNobar</h1>
+                            <p class="text-xs text-gray-400 font-medium">Admin Dashboard</p>
+                        </div>
                     </div>
                 </div>
                 
-                <nav class="space-y-2">
-                    <a href="../admin.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-home w-5"></i>
-                        <span>Dashboard</span>
+                <nav class="space-y-1 flex-1">
+                    <a href="../admin.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-home w-5 text-lg"></i>
+                        <span class="font-medium">Dashboard</span>
                     </a>
-                    <a href="movies.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600 transition">
-                        <i class="fas fa-film w-5"></i>
-                        <span>Movies</span>
+                    <a href="movies.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 shadow-lg">
+                        <i class="fas fa-film w-5 text-lg"></i>
+                        <span class="font-semibold">Movies</span>
                     </a>
-                    <a href="theaters.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-building w-5"></i>
-                        <span>Theaters</span>
+                    <a href="theaters.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-building w-5 text-lg"></i>
+                        <span class="font-medium">Theaters</span>
                     </a>
-                    <a href="categories.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-tags w-5"></i>
-                        <span>Categories</span>
+                    <a href="categories.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-tags w-5 text-lg"></i>
+                        <span class="font-medium">Categories</span>
                     </a>
                 </nav>
                 
-                <div class="mt-auto pt-6 border-t border-gray-700">
-                    <a href="../index.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
+                <div class="mt-auto pt-6 border-t border-slate-700 space-y-2">
+                    <a href="../index.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-700/50 text-gray-300">
                         <i class="fas fa-arrow-left w-5"></i>
-                        <span>Back to Home</span>
+                        <span class="font-medium">Back to Home</span>
                     </a>
-                    <button @click="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition">
+                    <button @click="logout()" class="w-full sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-600/90 text-gray-300 hover:text-white">
                         <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Logout</span>
+                        <span class="font-medium">Logout</span>
                     </button>
                 </div>
             </div>
@@ -77,14 +86,16 @@
         <!-- Main Content -->
         <div class="flex-1 overflow-auto">
             <!-- Header -->
-            <div class="bg-white shadow-md p-6">
-                <div class="flex items-center gap-4 mb-4">
-                    <button @click="goBack()" class="text-gray-600 hover:text-gray-800">
-                        <i class="fas fa-arrow-left text-xl"></i>
-                    </button>
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800" x-text="movie?.title || 'Loading...'"></h2>
-                        <p class="text-gray-600">Movie Details & Schedule Management</p>
+            <div class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
+                <div class="p-8">
+                    <div class="flex items-center gap-4">
+                        <button @click="goBack()" class="w-10 h-10 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
+                            <i class="fas fa-arrow-left text-xl text-gray-600"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900" x-text="movie?.title || 'Loading...'"></h2>
+                            <p class="text-gray-600">Movie Details & Schedule Management</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -375,7 +386,8 @@
                 async loadSchedules() {
                     try {
                         this.loading = true;
-                        const response = await fetch(`../api/schedules?movieId=` + this.movieId);
+                        // Add includeAll=true for admin to see all schedules including past ones
+                        const response = await fetch(`../api/schedules?movieId=` + this.movieId + `&includeAll=true`);
                         this.schedules = await response.json();
                         this.filteredSchedules = this.schedules;
                     } catch (error) {

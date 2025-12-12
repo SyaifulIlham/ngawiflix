@@ -64,6 +64,7 @@ public class ScheduleServlet extends HttpServlet {
             String movieIdParam = request.getParameter("movieId");
             String scheduleIdParam = request.getParameter("scheduleId");
             String idParam = request.getParameter("id");
+            String includeAllParam = request.getParameter("includeAll"); // for admin
             
             if (idParam != null) {
                 int scheduleId = Integer.parseInt(idParam);
@@ -80,7 +81,16 @@ public class ScheduleServlet extends HttpServlet {
                 out.print(gson.toJson(schedule));
             } else if (movieIdParam != null && !movieIdParam.trim().isEmpty()) {
                 int movieId = Integer.parseInt(movieIdParam.trim());
-                List<Schedule> schedules = scheduleDAO.getSchedulesByMovieId(movieId);
+                List<Schedule> schedules;
+                
+                // For admin, include all schedules (including past ones)
+                if ("true".equals(includeAllParam)) {
+                    schedules = scheduleDAO.getAllSchedulesByMovieId(movieId);
+                } else {
+                    // For users, only show future schedules
+                    schedules = scheduleDAO.getSchedulesByMovieId(movieId);
+                }
+                
                 out.print(gson.toJson(schedules));
             } else {
                 // Return all schedules for admin

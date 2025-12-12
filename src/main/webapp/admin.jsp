@@ -18,51 +18,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies Management - CinemaX Admin</title>
+    <title>Dashboard - AnjayNobar Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .sidebar-link {
+            transition: all 0.3s ease;
+        }
+        .sidebar-link:hover {
+            transform: translateX(5px);
+        }
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div x-data="moviesAdmin()" class="flex h-screen">
+<body>
+    <div x-data="dashboardAdmin()" class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-            <div class="p-6">
-                <div class="flex items-center gap-3 mb-8">
-                    <i class="fas fa-film text-red-500 text-2xl"></i>
-                    <div>
-                        <h1 class="text-xl font-bold">CinemaX</h1>
-                        <p class="text-sm text-gray-400">Admin Panel</p>
+        <div class="w-72 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl">
+            <div class="p-6 h-full flex flex-col">
+                <!-- Logo -->
+                <div class="mb-8 pb-6 border-b border-slate-700">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-film text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AnjayNobar</h1>
+                            <p class="text-xs text-gray-400 font-medium">Admin Dashboard</p>
+                        </div>
                     </div>
                 </div>
                 
-                <nav class="space-y-2">
-                    <a href="../admin.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600 transition">
-                        <i class="fas fa-home w-5"></i>
-                        <span>Dashboard</span>
+                <!-- Navigation -->
+                <nav class="space-y-1 flex-1">
+                    <a href="admin.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 shadow-lg">
+                        <i class="fas fa-home w-5 text-lg"></i>
+                        <span class="font-semibold">Dashboard</span>
                     </a>
-                    <a href="admin/movies.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-film w-5"></i>
-                        <span>Movies</span>
+                    <a href="admin/movies.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-film w-5 text-lg"></i>
+                        <span class="font-medium">Film</span>
                     </a>
-                    <a href="admin/theaters.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-building w-5"></i>
-                        <span>Theaters</span>
+                    <a href="admin/theaters.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-building w-5 text-lg"></i>
+                        <span class="font-medium">Bioskop</span>
                     </a>
-                    <a href="categories.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-tags w-5"></i>
-                        <span>Categories</span>
+                    <a href="admin/categories.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-tags w-5 text-lg"></i>
+                        <span class="font-medium">Kategori</span>
                     </a>
                 </nav>
                 
-                <div class="mt-auto pt-6 border-t border-gray-700">
-                    <a href="../index.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
+                <!-- Bottom Actions -->
+                <div class="mt-auto pt-6 border-t border-slate-700 space-y-2">
+                    <a href="index.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-700/50 text-gray-300">
                         <i class="fas fa-arrow-left w-5"></i>
-                        <span>Back to Home</span>
+                        <span class="font-medium">Kembali ke Beranda</span>
                     </a>
-                    <button @click="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition">
+                    <button @click="logout()" class="w-full sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-600/90 text-gray-300 hover:text-white">
                         <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Logout</span>
+                        <span class="font-medium">Logout</span>
                     </button>
                 </div>
             </div>
@@ -71,18 +100,192 @@
         <!-- Main Content -->
         <div class="flex-1 overflow-auto">
             <!-- Header -->
-            <div class="bg-white shadow-md p-6 flex justify-between items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Movies Management</h2>
-                    <p class="text-gray-600">Manage all movies in the system</p>
+            <div class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
+                <div class="p-8">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Selamat Datang, Admin!</h2>
+                            <p class="text-gray-600">Ini adalah ringkasan aktivitas bioskop Anda hari ini</p>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span x-text="new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                        </div>
+                    </div>
                 </div>
-                <button @click="openAddModal()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition">
-                    <i class="fas fa-plus"></i>
-                    <span>Add Movie</span>
-                </button>
             </div>
-            <h1>Selamat Datang Admin</h1>
+
+            <!-- Dashboard Content -->
+            <div class="p-8">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Movies -->
+                    <div class="card-hover stat-card rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-film text-2xl text-gray-700"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900 mb-1" x-text="stats.totalMovies || 0">0</h3>
+                        <p class="text-gray-600 text-sm">Total Film</p>
+                    </div>
+
+                    <!-- Total Theaters -->
+                    <div class="card-hover stat-card rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-building text-2xl text-gray-700"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900 mb-1" x-text="stats.totalTheaters || 0">0</h3>
+                        <p class="text-gray-600 text-sm">Total Bioskop</p>
+                    </div>
+
+                    <!-- Total Categories -->
+                    <div class="card-hover stat-card rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-tags text-2xl text-gray-700"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900 mb-1" x-text="stats.totalCategories || 0">0</h3>
+                        <p class="text-gray-600 text-sm">Total Kategori</p>
+                    </div>
+
+                    <!-- Total Schedules -->
+                    <div class="card-hover stat-card rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-2xl text-gray-700"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900 mb-1" x-text="stats.totalSchedules || 0">0</h3>
+                        <p class="text-gray-600 text-sm">Jadwal Aktiv</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Quick Actions Card -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="fas fa-bolt text-gray-700"></i>
+                            Quick Actions
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <a href="admin/movies.jsp" class="card-hover flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-400 hover:bg-gray-100">
+                                <i class="fas fa-plus-circle text-3xl text-gray-700 mb-2"></i>
+                                <span class="text-sm font-semibold text-gray-900">Add Movie</span>
+                            </a>
+                            <a href="admin/theaters.jsp" class="card-hover flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-400 hover:bg-gray-100">
+                                <i class="fas fa-plus-circle text-3xl text-gray-700 mb-2"></i>
+                                <span class="text-sm font-semibold text-gray-900">Add Theater</span>
+                            </a>
+                            <a href="admin/categories.jsp" class="card-hover flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-400 hover:bg-gray-100">
+                                <i class="fas fa-plus-circle text-3xl text-gray-700 mb-2"></i>
+                                <span class="text-sm font-semibold text-gray-900">Add Category</span>
+                            </a>
+                            <a href="admin/movies.jsp" class="card-hover flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-400 hover:bg-gray-100">
+                                <i class="fas fa-list text-3xl text-gray-700 mb-2"></i>
+                                <span class="text-sm font-semibold text-gray-900">View All</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- System Info -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="fas fa-info-circle text-gray-700"></i>
+                            System Information
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <span class="text-sm text-gray-600">Role</span>
+                                <span class="text-sm font-semibold text-gray-900">Administrator</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <span class="text-sm text-gray-600">Status</span>
+                                <span class="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                    Online
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <span class="text-sm text-gray-600">Last Login</span>
+                                <span class="text-sm font-semibold text-gray-900" x-text="new Date().toLocaleTimeString('id-ID')"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        function dashboardAdmin() {
+            return {
+                stats: {
+                    totalMovies: 0,
+                    totalTheaters: 0,
+                    totalCategories: 0,
+                    totalSchedules: 0
+                },
+
+                async init() {
+                    await this.loadStats();
+                },
+
+                async loadStats() {
+                    try {
+                        // Load movies count
+                        const moviesResponse = await fetch('api/movies');
+                        if (moviesResponse.ok) {
+                            const movies = await moviesResponse.json();
+                            this.stats.totalMovies = Array.isArray(movies) ? movies.length : 0;
+                        }
+
+                        // Load theaters count
+                        const theatersResponse = await fetch('api/theaters');
+                        if (theatersResponse.ok) {
+                            const theaters = await theatersResponse.json();
+                            this.stats.totalTheaters = Array.isArray(theaters) ? theaters.length : 0;
+                        }
+
+                        // Load categories count
+                        const categoriesResponse = await fetch('api/categories');
+                        if (categoriesResponse.ok) {
+                            const categories = await categoriesResponse.json();
+                            this.stats.totalCategories = Array.isArray(categories) ? categories.length : 0;
+                        }
+
+                        // Load schedules count (only future schedules)
+                        const schedulesResponse = await fetch('api/schedules');
+                        if (schedulesResponse.ok) {
+                            const schedules = await schedulesResponse.json();
+                            if (Array.isArray(schedules)) {
+                                // Filter only future schedules
+                                const now = new Date();
+                                const futureSchedules = schedules.filter(schedule => {
+                                    const scheduleDate = new Date(schedule.showDate + ' ' + schedule.showTime);
+                                    return scheduleDate > now;
+                                });
+                                this.stats.totalSchedules = futureSchedules.length;
+                            } else {
+                                this.stats.totalSchedules = 0;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error loading stats:', error);
+                    }
+                },
+
+                logout() {
+                    if (confirm('Are you sure you want to logout?')) {
+                        window.location.href = 'api/auth?action=logout';
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>

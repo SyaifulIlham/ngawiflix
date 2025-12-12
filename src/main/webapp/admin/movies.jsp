@@ -18,51 +18,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies Management - CinemaX Admin</title>
+    <title>Movies Management - AnjayNobar Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body { background: #f8f9fa; }
+        .sidebar-link { transition: all 0.3s ease; }
+        .sidebar-link:hover { transform: translateX(5px); }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div x-data="moviesAdmin()" class="flex h-screen">
+<body>
+    <div x-data="moviesAdmin()" class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-            <div class="p-6">
-                <div class="flex items-center gap-3 mb-8">
-                    <i class="fas fa-film text-red-500 text-2xl"></i>
-                    <div>
-                        <h1 class="text-xl font-bold">CinemaX</h1>
-                        <p class="text-sm text-gray-400">Admin Panel</p>
+        <div class="w-72 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl">
+            <div class="p-6 h-full flex flex-col">
+                <div class="mb-8 pb-6 border-b border-slate-700">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-film text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AnjayNobar</h1>
+                            <p class="text-xs text-gray-400 font-medium">Admin Dashboard</p>
+                        </div>
                     </div>
                 </div>
                 
-                <nav class="space-y-2">
-                    <a href="../admin.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-home w-5"></i>
-                        <span>Dashboard</span>
+                <nav class="space-y-1 flex-1">
+                    <a href="../admin.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-home w-5 text-lg"></i>
+                        <span class="font-medium">Dashboard</span>
                     </a>
-                    <a href="movies.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600 transition">
-                        <i class="fas fa-film w-5"></i>
-                        <span>Movies</span>
+                    <a href="movies.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 shadow-lg">
+                        <i class="fas fa-film w-5 text-lg"></i>
+                        <span class="font-semibold">Film</span>
                     </a>
-                    <a href="theaters.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-building w-5"></i>
-                        <span>Theaters</span>
+                    <a href="theaters.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-building w-5 text-lg"></i>
+                        <span class="font-medium">Bioskop</span>
                     </a>
-                    <a href="categories.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-tags w-5"></i>
-                        <span>Categories</span>
+                    <a href="categories.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
+                        <i class="fas fa-tags w-5 text-lg"></i>
+                        <span class="font-medium">Kategori</span>
                     </a>
                 </nav>
                 
-                <div class="mt-auto pt-6 border-t border-gray-700">
-                    <a href="../index.jsp" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700 transition">
+                <div class="mt-auto pt-6 border-t border-slate-700 space-y-2">
+                    <a href="../index.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-700/50 text-gray-300">
                         <i class="fas fa-arrow-left w-5"></i>
-                        <span>Back to Home</span>
+                        <span class="font-medium">Kembali ke Beranda</span>
                     </a>
-                    <button @click="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition">
+                    <button @click="logout()" class="w-full sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-600/90 text-gray-300 hover:text-white">
                         <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Logout</span>
+                        <span class="font-medium">Logout</span>
                     </button>
                 </div>
             </div>
@@ -71,15 +80,19 @@
         <!-- Main Content -->
         <div class="flex-1 overflow-auto">
             <!-- Header -->
-            <div class="bg-white shadow-md p-6 flex justify-between items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Movies Management</h2>
-                    <p class="text-gray-600">Manage all movies in the system</p>
+            <div class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
+                <div class="p-8">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Manajemen Film</h2>
+                            <p class="text-gray-600">Kelola semua film dalam sistem</p>
+                        </div>
+                        <button @click="openAddModal()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                            <i class="fas fa-plus"></i>
+                            <span>Tambah Film</span>
+                        </button>
+                    </div>
                 </div>
-                <button @click="openAddModal()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition">
-                    <i class="fas fa-plus"></i>
-                    <span>Add Movie</span>
-                </button>
             </div>
 
             <!-- Movies Table -->
@@ -94,7 +107,7 @@
                         </div>
                         <select x-model="filterCategory" @change="filterMovies()" 
                                 class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
-                            <option value="">All Categories</option>
+                            <option value="">Semua Kategori</option>
                             <template x-for="category in categories" :key="category.categoryId">
                                 <option :value="category.categoryId" x-text="category.categoryName"></option>
                             </template>
@@ -107,13 +120,13 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Poster</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Director</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Judul</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sutradara</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Durasi</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tahun</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
@@ -129,7 +142,7 @@
                                     <tr>
                                         <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                                             <i class="fas fa-film text-4xl mb-2"></i>
-                                            <p>No movies found</p>
+                                            <p>Tidak ada film ditemukan</p>
                                         </td>
                                     </tr>
                                 </template>
@@ -154,10 +167,10 @@
                                         <td class="px-6 py-4 text-sm text-gray-900" x-text="movie.releaseYear"></td>
                                         <td class="px-6 py-4">
                                             <span x-show="movie.isNew" class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                New
+                                                Baru
                                             </span>
                                             <span x-show="movie.isFeatured" class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 ml-1">
-                                                Featured
+                                                Unggulan
                                             </span>
                                         </td>
                                         <td class="px-6 py-4">
@@ -202,20 +215,20 @@
                         <!-- Left Column -->
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Judul *</label>
                                 <input type="text" x-model="formData.title" required
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Director *</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sutradara *</label>
                                 <input type="text" x-model="formData.director" required
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                             </div>
                             
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Duration (min) *</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Durasi (menit) *</label>
                                     <input type="number" x-model="formData.duration" required min="1"
                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                                 </div>
@@ -239,14 +252,14 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Release Year *</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tahun Rilis *</label>
                                     <input type="number" x-model="formData.releaseYear" required min="1900" max="2100"
                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                                 </div>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi *</label>
                                 <textarea x-model="formData.description" required rows="4"
                                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
                             </div>
@@ -276,7 +289,7 @@
                                        @input="updateTrailerPreview()"
                                        placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
-                                <p class="text-xs text-gray-500 mt-1">YouTube or video URL for movie trailer</p>
+                                <p class="text-xs text-gray-500 mt-1">URL YouTube atau video untuk trailer film</p>
                                 
                                 <!-- Trailer Preview -->
                                 <div x-show="formData.trailerUrl && trailerEmbedUrl" class="mt-3">
@@ -307,7 +320,7 @@
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Categories</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
                                 <div class="space-y-2 max-h-40 overflow-y-auto border rounded-lg p-3">
                                     <template x-for="category in categories" :key="category.categoryId">
                                         <label class="flex items-center gap-2">
@@ -325,12 +338,12 @@
                                 <label class="flex items-center gap-2">
                                     <input type="checkbox" x-model="formData.isNew"
                                            class="rounded text-red-600 focus:ring-red-500">
-                                    <span class="text-sm font-medium text-gray-700">Mark as New</span>
+                                    <span class="text-sm font-medium text-gray-700">Tandai Sebagai Terbaru</span>
                                 </label>
                                 <label class="flex items-center gap-2">
                                     <input type="checkbox" x-model="formData.isFeatured"
                                            class="rounded text-red-600 focus:ring-red-500">
-                                    <span class="text-sm font-medium text-gray-700">Mark as Featured</span>
+                                    <span class="text-sm font-medium text-gray-700">Tandai sebagai Unggulan</span>
                                 </label>
                             </div>
                         </div>
@@ -339,7 +352,7 @@
                     <div class="mt-6 flex justify-end gap-3 border-t pt-4">
                         <button type="button" @click="closeModal()" 
                                 class="px-6 py-2 border rounded-lg hover:bg-gray-50">
-                            Cancel
+                            Batal
                         </button>
                         <button type="submit" 
                                 class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
@@ -356,19 +369,19 @@
             <div class="bg-white rounded-lg shadow-xl p-6 max-w-md">
                 <div class="text-center">
                     <i class="fas fa-exclamation-triangle text-red-500 text-5xl mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2">Delete Movie?</h3>
+                    <h3 class="text-xl font-bold mb-2">Hapus Film?</h3>
                     <p class="text-gray-600 mb-6">
-                        Are you sure you want to delete "<span x-text="movieToDelete?.title"></span>"? 
-                        This action cannot be undone.
+                        Apa Anda yakin ingin menghapus "<span x-text="movieToDelete?.title"></span>"? 
+                        Tindakan ini tidak dapat dibatalkan.
                     </p>
                     <div class="flex gap-3 justify-center">
                         <button @click="showDeleteModal = false" 
                                 class="px-6 py-2 border rounded-lg hover:bg-gray-50">
-                            Cancel
+                            Batal
                         </button>
                         <button @click="deleteMovie()" 
                                 class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                            Delete
+                            Hapus
                         </button>
                     </div>
                 </div>

@@ -1243,20 +1243,36 @@
                 async filterMovies() {
                     try {
                         this.loading = true;
-                        let url = 'api/movies';
                         
+                        // Start with all movies
+                        let filtered = [...this.movies];
+                        
+                        // Filter by category if not 'all'
                         if (this.selectedCategory !== 'all') {
-                            url += `?category=` + this.selectedCategory;
+                            filtered = filtered.filter(movie => {
+                                if (movie.genre && Array.isArray(movie.genre)) {
+                                    return movie.genre.some(g => 
+                                        g.toLowerCase() === this.selectedCategory.toLowerCase()
+                                    );
+                                }
+                                return false;
+                            });
                         }
                         
-                        if (this.searchQuery) {
-                            const separator = url.includes('?') ? '&' : '?';
-                            url += `${separator}search=` + encodeURIComponent(this.searchQuery);
+                        // Filter by search query
+                        if (this.searchQuery && this.searchQuery.trim() !== '') {
+                            const query = this.searchQuery.toLowerCase().trim();
+                            filtered = filtered.filter(movie => {
+                                const titleMatch = movie.title.toLowerCase().includes(query);
+                                const directorMatch = movie.director && movie.director.toLowerCase().includes(query);
+                                const genreMatch = movie.genre && movie.genre.some(g => 
+                                    g.toLowerCase().includes(query)
+                                );
+                                return titleMatch || directorMatch || genreMatch;
+                            });
                         }
                         
-                        const response = await fetch(url);
-                        const movies = await response.json();
-                        this.filteredMovies = movies.map(movie => this.transformMovie(movie));
+                        this.filteredMovies = filtered;
                     } catch (error) {
                         console.error('Error filtering movies:', error);
                     } finally {
