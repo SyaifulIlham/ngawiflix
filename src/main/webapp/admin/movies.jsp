@@ -23,71 +23,154 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        body { background: #f8f9fa; }
-        .sidebar-link { transition: all 0.3s ease; }
-        .sidebar-link:hover { transform: translateX(5px); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body { 
+            background: #f8f9fa;
+        }
+        
+        .header-section {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .modern-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .table-modern {
+            border-spacing: 0 8px;
+            border-collapse: separate;
+        }
+        
+        .table-row-modern {
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .table-row-modern:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: #1f2937;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #111827;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-modern {
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .input-modern:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .poster-frame {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .poster-frame img {
+            transition: transform 0.3s ease;
+        }
+        
+        .poster-frame:hover img {
+            transform: scale(1.05);
+        }
+        
+        .badge-minimal {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .rating-box {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            padding: 0.375rem 0.75rem;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
     </style>
 </head>
 <body>
     <div x-data="moviesAdmin()" class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="w-72 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl">
-            <div class="p-6 h-full flex flex-col">
-                <div class="mb-8 pb-6 border-b border-slate-700">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
-                            <i class="fas fa-film text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AnjayNobar</h1>
-                            <p class="text-xs text-gray-400 font-medium">Admin Dashboard</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <nav class="space-y-1 flex-1">
-                    <a href="../admin.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
-                        <i class="fas fa-home w-5 text-lg"></i>
-                        <span class="font-medium">Dashboard</span>
-                    </a>
-                    <a href="movies.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 shadow-lg">
-                        <i class="fas fa-film w-5 text-lg"></i>
-                        <span class="font-semibold">Film</span>
-                    </a>
-                    <a href="theaters.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
-                        <i class="fas fa-building w-5 text-lg"></i>
-                        <span class="font-medium">Bioskop</span>
-                    </a>
-                    <a href="categories.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
-                        <i class="fas fa-tags w-5 text-lg"></i>
-                        <span class="font-medium">Kategori</span>
-                    </a>
-                </nav>
-                
-                <div class="mt-auto pt-6 border-t border-slate-700 space-y-2">
-                    <a href="../index.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-700/50 text-gray-300">
-                        <i class="fas fa-arrow-left w-5"></i>
-                        <span class="font-medium">Kembali ke Beranda</span>
-                    </a>
-                    <button @click="logout()" class="w-full sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-600/90 text-gray-300 hover:text-white">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span class="font-medium">Logout</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+        <jsp:include page="../component/admin/sidebar.jsp" />
 
         <!-- Main Content -->
-        <div class="flex-1 overflow-auto">
+        <div class="flex-1 overflow-auto scrollbar-minimal bg-gray-50">
             <!-- Header -->
-            <div class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
-                <div class="p-8">
+            <div class="header-section sticky top-0 z-10">
+                <div class="p-6">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Manajemen Film</h2>
-                            <p class="text-gray-600">Kelola semua film dalam sistem</p>
+                        <div class="fade-in">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-1">Manajemen Film</h2>
+                            <p class="text-gray-600 text-sm">Kelola semua film dalam sistem</p>
                         </div>
-                        <button @click="openAddModal()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                        <button @click="openAddModal()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
                             <i class="fas fa-plus"></i>
                             <span>Tambah Film</span>
                         </button>
@@ -95,98 +178,133 @@
                 </div>
             </div>
 
-            <!-- Movies Table -->
+            <!-- Movies Grid -->
             <div class="p-6">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="modern-card rounded-lg overflow-hidden fade-in">
                     <!-- Search and Filter -->
-                    <div class="p-4 border-b flex gap-4">
-                        <div class="flex-1">
-                            <input type="text" x-model="searchQuery" @input="searchMovies()" 
-                                   placeholder="Search movies..." 
-                                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <div class="p-4 bg-gray-50 border-b">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <div class="flex-1 relative">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                                <input type="text" x-model="searchQuery" @input="searchMovies()" 
+                                       placeholder="Cari film..." 
+                                       class="input-modern w-full pl-10 pr-4 py-2.5 rounded-lg text-sm">
+                            </div>
+                            <div class="relative">
+                                <select x-model="filterCategory" @change="filterMovies()" 
+                                        class="input-modern pl-4 pr-10 py-2.5 rounded-lg appearance-none bg-white text-sm min-w-[180px]">
+                                    <option value="">Semua Kategori</option>
+                                    <template x-for="category in categories" :key="category.categoryId">
+                                        <option :value="category.categoryId" x-text="category.categoryName"></option>
+                                    </template>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                            </div>
                         </div>
-                        <select x-model="filterCategory" @change="filterMovies()" 
-                                class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
-                            <option value="">Semua Kategori</option>
-                            <template x-for="category in categories" :key="category.categoryId">
-                                <option :value="category.categoryId" x-text="category.categoryName"></option>
-                            </template>
-                        </select>
                     </div>
 
                     <!-- Table -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Poster</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Judul</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sutradara</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Durasi</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tahun</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                    <div class="overflow-x-auto scrollbar-minimal">
+                        <table class="table-modern w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Poster</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Judul</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Sutradara</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Durasi</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Rating</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Tahun</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
+                            <tbody>
                                 <template x-if="loading">
                                     <tr>
-                                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">
-                                            <i class="fas fa-spinner fa-spin text-3xl mb-2"></i>
-                                            <p>Loading movies...</p>
+                                        <td colspan="8" class="px-4 py-12 text-center">
+                                            <div class="flex flex-col items-center gap-3">
+                                                <div class="w-12 h-12 border-3 border-gray-200 border-t-gray-800 rounded-full animate-spin"></div>
+                                                <p class="text-gray-600 text-sm">Memuat data...</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
                                 <template x-if="!loading && filteredMovies.length === 0">
                                     <tr>
-                                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">
-                                            <i class="fas fa-film text-4xl mb-2"></i>
-                                            <p>Tidak ada film ditemukan</p>
+                                        <td colspan="8" class="px-4 py-12 text-center">
+                                            <div class="flex flex-col items-center gap-3">
+                                                <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                                                    <i class="fas fa-film text-3xl text-gray-400"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-gray-700 font-medium mb-1">Tidak ada film ditemukan</p>
+                                                    <p class="text-gray-500 text-sm">Coba ubah filter pencarian</p>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
                                 <template x-for="movie in filteredMovies" :key="movie.movieId">
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4">
-                                            <img :src="movie.posterUrl" :alt="movie.title" 
-                                                 class="w-16 h-24 object-cover rounded">
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="font-medium text-gray-900" x-text="movie.title"></div>
-                                            <div class="text-sm text-gray-500" x-text="movie.rated"></div>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900" x-text="movie.director"></td>
-                                        <td class="px-6 py-4 text-sm text-gray-900" x-text="movie.duration + ' min'"></td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-1">
-                                                <i class="fas fa-star text-yellow-500"></i>
-                                                <span class="text-sm font-medium" x-text="movie.rating"></span>
+                                    <tr class="table-row-modern border-b border-gray-100 last:border-0">
+                                        <td class="px-4 py-3">
+                                            <div class="poster-frame w-16 h-24">
+                                                <img :src="movie.posterUrl" :alt="movie.title" 
+                                                     class="w-full h-full object-cover">
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900" x-text="movie.releaseYear"></td>
-                                        <td class="px-6 py-4">
-                                            <span x-show="movie.isNew" class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                Baru
-                                            </span>
-                                            <span x-show="movie.isFeatured" class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 ml-1">
-                                                Unggulan
+                                        <td class="px-4 py-3">
+                                            <div class="font-semibold text-gray-900 mb-1" x-text="movie.title"></div>
+                                            <span class="badge-minimal inline-block"
+                                                 :class="{
+                                                     'bg-green-100 text-green-700': movie.rated === 'SU',
+                                                     'bg-yellow-100 text-yellow-700': movie.rated === '13+',
+                                                     'bg-orange-100 text-orange-700': movie.rated === '17+',
+                                                     'bg-red-100 text-red-700': movie.rated === '21+'
+                                                 }"
+                                                 x-text="movie.rated">
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex gap-2">
+                                        <td class="px-4 py-3">
+                                            <span class="text-gray-700 text-sm" x-text="movie.director"></span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="text-gray-700 text-sm" x-text="movie.duration + ' min'"></span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="rating-box">
+                                                <i class="fas fa-star text-yellow-600 text-sm"></i>
+                                                <span class="text-gray-900 font-semibold text-sm" x-text="movie.rating"></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="text-gray-700 text-sm" x-text="movie.releaseYear"></span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex flex-wrap gap-1">
+                                                <span x-show="movie.isNew" class="badge-minimal bg-green-50 text-green-700 border border-green-200">
+                                                    Baru
+                                                </span>
+                                                <span x-show="movie.isFeatured" class="badge-minimal bg-blue-50 text-blue-700 border border-blue-200">
+                                                    Unggulan
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex gap-1">
                                                 <button @click="viewMovieDetail(movie)" 
-                                                        class="text-green-600 hover:text-green-800" 
-                                                        title="View Details & Manage Schedules">
-                                                    <i class="fas fa-eye"></i>
+                                                        class="action-btn bg-blue-50 text-blue-600 hover:bg-blue-100" 
+                                                        title="Lihat Detail">
+                                                    <i class="fas fa-eye text-sm"></i>
                                                 </button>
                                                 <button @click="openEditModal(movie)" 
-                                                        class="text-blue-600 hover:text-blue-800">
-                                                    <i class="fas fa-edit"></i>
+                                                        class="action-btn bg-amber-50 text-amber-600 hover:bg-amber-100"
+                                                        title="Edit">
+                                                    <i class="fas fa-edit text-sm"></i>
                                                 </button>
                                                 <button @click="confirmDelete(movie)" 
-                                                        class="text-red-600 hover:text-red-800">
-                                                    <i class="fas fa-trash"></i>
+                                                        class="action-btn bg-red-50 text-red-600 hover:bg-red-100"
+                                                        title="Hapus">
+                                                    <i class="fas fa-trash text-sm"></i>
                                                 </button>
                                             </div>
                                         </td>

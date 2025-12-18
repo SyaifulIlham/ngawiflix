@@ -23,73 +23,124 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        body { background: #f8f9fa; }
-        .sidebar-link { transition: all 0.3s ease; }
-        .sidebar-link:hover { transform: translateX(5px); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body { 
+            background: #f8f9fa;
+        }
+        
+        .header-section {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .modern-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .table-modern {
+            border-spacing: 0 8px;
+            border-collapse: separate;
+        }
+        
+        .table-row-modern {
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .table-row-modern:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: #1f2937;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #111827;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-modern {
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .input-modern:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
     </style>
 </head>
 <body>
     <div x-data="theatersAdmin()" class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="w-72 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl">
-            <div class="p-6 h-full flex flex-col">
-                <div class="mb-8 pb-6 border-b border-slate-700">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
-                            <i class="fas fa-film text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AnjayNobar</h1>
-                            <p class="text-xs text-gray-400 font-medium">Admin Dashboard</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <nav class="space-y-1 flex-1">
-                    <a href="../admin.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
-                        <i class="fas fa-home w-5 text-lg"></i>
-                        <span class="font-medium">Dashboard</span>
-                    </a>
-                    <a href="movies.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
-                        <i class="fas fa-film w-5 text-lg"></i>
-                        <span class="font-medium">Film</span>
-                    </a>
-                    <a href="theaters.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 shadow-lg">
-                        <i class="fas fa-building w-5 text-lg"></i>
-                        <span class="font-semibold">Bioskop</span>
-                    </a>
-                    <a href="categories.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-700/50">
-                        <i class="fas fa-tags w-5 text-lg"></i>
-                        <span class="font-medium">Kategori</span>
-                    </a>
-                </nav>
-                
-                <div class="mt-auto pt-6 border-t border-slate-700 space-y-2">
-                    <a href="../index.jsp" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-700/50 text-gray-300">
-                        <i class="fas fa-arrow-left w-5"></i>
-                        <span class="font-medium">Kembali ke Beranda</span>
-                    </a>
-                    <button @click="logout()" class="w-full sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-600/90 text-gray-300 hover:text-white">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span class="font-medium">Logout</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+        <jsp:include page="../component/admin/sidebar.jsp" />
 
         <!-- Main Content -->
-        <div class="flex-1 overflow-auto">
+        <div class="flex-1 overflow-auto scrollbar-minimal bg-gray-50">
             <!-- Header -->
-            <div class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
-                <div class="p-8">
+            <div class="header-section sticky top-0 z-10">
+                <div class="p-6">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Theaters Management</h2>
-                            <p class="text-gray-600">Manage all theaters in the system</p>
+                        <div class="fade-in">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-1">Manajemen Theater</h2>
+                            <p class="text-gray-600 text-sm">Kelola semua bioskop dalam sistem</p>
                         </div>
-                        <button @click="openAddModal()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                        <button @click="openAddModal()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
                             <i class="fas fa-plus"></i>
-                            <span>Add Theater</span>
+                            <span>Tambah Theater</span>
                         </button>
                     </div>
                 </div>
@@ -97,62 +148,70 @@
 
             <!-- Theaters Table -->
             <div class="p-6">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="modern-card rounded-lg overflow-hidden fade-in">
                     <!-- Search -->
-                    <div class="p-4 border-b">
+                    <div class="p-4 bg-gray-50 border-b">
                         <input type="text" x-model="searchQuery" @input="searchTheaters()" 
-                               placeholder="Search theaters..." 
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                               placeholder="Cari theater..." 
+                               class="input-modern w-full px-4 py-2.5 rounded-lg text-sm">
                     </div>
 
                     <!-- Table -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Theater Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Seats</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <div class="overflow-x-auto scrollbar-minimal">
+                        <table class="table-modern w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">ID</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Nama Theater</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Lokasi</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Total Kursi</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Dibuat</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
+                            <tbody>
                                 <template x-if="loading">
                                     <tr>
-                                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
-                                            <i class="fas fa-spinner fa-spin text-3xl mb-2"></i>
-                                            <p>Loading theaters...</p>
+                                        <td colspan="6" class="px-4 py-12 text-center">
+                                            <div class="flex flex-col items-center gap-3">
+                                                <div class="w-12 h-12 border-3 border-gray-200 border-t-gray-800 rounded-full animate-spin"></div>
+                                                <p class="text-gray-600 text-sm">Memuat data...</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
                                 <template x-if="!loading && filteredTheaters.length === 0">
                                     <tr>
-                                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
-                                            <i class="fas fa-building text-4xl mb-2"></i>
-                                            <p>No theaters found</p>
+                                        <td colspan="6" class="px-4 py-12 text-center">
+                                            <div class="flex flex-col items-center gap-3">
+                                                <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                                                    <i class="fas fa-building text-3xl text-gray-400"></i>
+                                                </div>
+                                                <p class="text-gray-700 font-medium">Tidak ada theater ditemukan</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
                                 <template x-for="theater in filteredTheaters" :key="theater.theaterId">
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm text-gray-900" x-text="theater.theaterId"></td>
-                                        <td class="px-6 py-4">
-                                            <div class="font-medium text-gray-900" x-text="theater.theaterName"></div>
+                                    <tr class="table-row-modern border-b border-gray-100 last:border-0">
+                                        <td class="px-4 py-3 text-sm text-gray-700" x-text="theater.theaterId"></td>
+                                        <td class="px-4 py-3">
+                                            <div class="font-semibold text-gray-900" x-text="theater.theaterName"></div>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900" x-text="theater.location"></td>
-                                        <td class="px-6 py-4 text-sm text-gray-900" x-text="theater.totalSeats"></td>
-                                        <td class="px-6 py-4 text-sm text-gray-500" x-text="formatDate(theater.createdAt)"></td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex gap-2">
+                                        <td class="px-4 py-3 text-sm text-gray-700" x-text="theater.location"></td>
+                                        <td class="px-4 py-3 text-sm text-gray-700" x-text="theater.totalSeats"></td>
+                                        <td class="px-4 py-3 text-sm text-gray-500" x-text="formatDate(theater.createdAt)"></td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex gap-1">
                                                 <button @click="openEditModal(theater)" 
-                                                        class="text-blue-600 hover:text-blue-800">
-                                                    <i class="fas fa-edit"></i>
+                                                        class="action-btn bg-amber-50 text-amber-600 hover:bg-amber-100"
+                                                        title="Edit">
+                                                    <i class="fas fa-edit text-sm"></i>
                                                 </button>
                                                 <button @click="confirmDelete(theater)" 
-                                                        class="text-red-600 hover:text-red-800">
-                                                    <i class="fas fa-trash"></i>
+                                                        class="action-btn bg-red-50 text-red-600 hover:bg-red-100"
+                                                        title="Hapus">
+                                                    <i class="fas fa-trash text-sm"></i>
                                                 </button>
                                             </div>
                                         </td>

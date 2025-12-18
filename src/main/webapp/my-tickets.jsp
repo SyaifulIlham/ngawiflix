@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiket Saya - CinemaX</title>
+    <title>Tiket Saya - AnjayNobar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -444,11 +444,6 @@
                     const leftCol = 10;
                     const lineHeight = 7;
                     
-                    // Date
-                    doc.setFont(undefined, 'bold');
-                    doc.text('TANGGAL', leftCol, yPos);
-                    doc.setFont(undefined, 'normal');
-                    doc.text(ticket.showDate || '-', leftCol, yPos + 4);
                     
                     // Time
                     yPos += lineHeight + 4;
