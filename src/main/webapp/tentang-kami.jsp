@@ -164,8 +164,8 @@
                     <div class="team-card team-card-red text-center">
                         <div class="relative inline-block mb-4">
                             <div
-                                class="w-24 h-24 rounded-lg bg-gradient-to-br from-red-500 to-red-900 flex items-center justify-center text-4xl font-bold mx-auto">
-                                <i class="fas fa-user text-white/70"></i>
+                                class="w-28 h-28 rounded-lg bg-gradient-to-br from-red-500 to-red-900 flex items-center justify-center text-4xl font-bold mx-auto">
+                                <img src="./assets/raffa.png" class="w-[95%] h-[95%] object-cover rounded-lg" alt="Raffa Yuda Pratama">
                             </div>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Raffa Yuda Pratama</h3>
@@ -187,8 +187,8 @@
                     <div class="team-card team-card-blue text-center">
                         <div class="relative inline-block mb-4">
                             <div
-                                class="w-24 h-24 rounded-lg bg-gradient-to-br from-blue-500 to-blue-900 flex items-center justify-center text-4xl font-bold mx-auto">
-                                <i class="fas fa-user text-white/70"></i>
+                                class="w-28 h-28 rounded-lg bg-gradient-to-br from-blue-500 to-blue-900 flex items-center justify-center text-4xl font-bold mx-auto">
+                                <img src="./assets/hamizan.jpeg" class="w-[95%] h-[95%] object-cover rounded-lg" alt="Ahmad Hamizan">
                             </div>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Ahmad Hamizan</h3>
@@ -210,8 +210,8 @@
                     <div class="team-card team-card-purple text-center">
                         <div class="relative inline-block mb-4">
                             <div
-                                class="w-24 h-24 rounded-lg bg-gradient-to-br from-purple-500 to-purple-900 flex items-center justify-center text-4xl font-bold mx-auto">
-                                <i class="fas fa-user text-white/70"></i>
+                                class="w-28 h-28 rounded-lg bg-gradient-to-br from-purple-500 to-purple-900 flex items-center justify-center text-4xl font-bold mx-auto">
+                                <img src="./assets/wahyu.jpeg" class="w-[95%] h-[95%] object-cover rounded-lg" alt="Wahyu Ahmad Yassin">
                             </div>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Wahyu Ahmad Yassin</h3>
@@ -233,8 +233,8 @@
                     <div class="team-card team-card-green text-center">
                         <div class="relative inline-block mb-4">
                             <div
-                                class="w-24 h-24 rounded-lg bg-gradient-to-br from-green-500 to-green-900 flex items-center justify-center text-4xl font-bold mx-auto">
-                                <i class="fas fa-user text-white/70"></i>
+                                class="w-28 h-28 rounded-lg bg-gradient-to-br from-green-500 to-green-900 flex items-center justify-center text-4xl font-bold mx-auto">
+                                <img src="./assets/ipul.jpeg" class="w-[95%] h-[95%] object-cover rounded-lg" alt="Syaiful Ilham">
                             </div>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Syaiful Ilham</h3>
@@ -257,7 +257,7 @@
                         <div class="relative inline-block mb-4">
                             <div
                                 class="w-28 h-28 rounded-lg bg-gradient-to-br from-green-500 to-green-900 flex items-center justify-center text-4xl font-bold mx-auto">
-                                <img src="./assets/zahra2.jpeg" class="w-[95%] h-[95%] rounded-lg" alt="Zahra Aulia Rahmani">
+                                <img src="./assets/zahra2.jpeg" class="w-[95%] h-[95%] object-cover rounded-lg" alt="Zahra Aulia Rahmani">
                             </div>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Zahra Aulia Rahmani</h3>
