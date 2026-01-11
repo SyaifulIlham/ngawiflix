@@ -15,8 +15,10 @@
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="index.jsp" class="nav-link hover:text-red-500 transition" data-page="index">Beranda</a>
-                <a href="index.jsp#movies" class="nav-link hover:text-red-500 transition" data-page="index">Film</a>
+                <a href="index.jsp" class="nav-link hover:text-red-500 transition" data-page="index"
+                    data-hash="">Beranda</a>
+                <a href="index.jsp#movies" class="nav-link hover:text-red-500 transition" data-page="index"
+                    data-hash="movies">Film</a>
                 <a href="tentang-kami.jsp" class="nav-link hover:text-red-500 transition"
                     data-page="tentang-kami">Tentang Kami</a>
                 <a href="galeri.jsp" class="nav-link hover:text-red-500 transition" data-page="galeri">Galeri</a>
@@ -55,6 +57,9 @@
                             </div>
                         </template>
 
+                        <a href="profile.jsp" class="block px-4 py-2 hover:bg-slate-700 transition">
+                            <i class="fas fa-user mr-2"></i> Profile
+                        </a>
                         <a href="my-tickets.jsp" class="block px-4 py-2 hover:bg-slate-700 transition">
                             <i class="fas fa-ticket-alt mr-2"></i> Tiket Saya
                         </a>
@@ -88,10 +93,10 @@
     <!-- Mobile Menu -->
     <div x-show="mobileMenu" x-transition class="md:hidden bg-slate-900 border-t border-slate-800">
         <div class="container mx-auto px-4 py-4 space-y-3">
-            <a href="index.jsp" class="nav-link-mobile block py-2 hover:text-red-500 transition"
-                data-page="index">Beranda</a>
+            <a href="index.jsp" class="nav-link-mobile block py-2 hover:text-red-500 transition" data-page="index"
+                data-hash="">Beranda</a>
             <a href="index.jsp#movies" class="nav-link-mobile block py-2 hover:text-red-500 transition"
-                data-page="index">Film</a>
+                data-page="index" data-hash="movies">Film</a>
             <a href="tentang-kami.jsp" class="nav-link-mobile block py-2 hover:text-red-500 transition"
                 data-page="tentang-kami">Tentang Kami</a>
             <a href="galeri.jsp" class="nav-link-mobile block py-2 hover:text-red-500 transition"
@@ -126,21 +131,51 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Get current page name from URL
             const currentPage = window.location.pathname.split('/').pop().replace('.jsp', '') || 'index';
+            const currentHash = window.location.hash.replace('#', '');
+
+            // Function to check if link should be active
+            function isLinkActive(link) {
+                const linkPage = link.getAttribute('data-page');
+                const linkHash = link.getAttribute('data-hash');
+
+                // Check if page matches
+                if (linkPage !== currentPage) return false;
+
+                // If link has a hash requirement, check if it matches current hash
+                if (linkHash !== null) {
+                    return linkHash === currentHash;
+                }
+
+                return true;
+            }
 
             // Add active class to matching nav links (desktop)
             document.querySelectorAll('.nav-link').forEach(link => {
-                const linkPage = link.getAttribute('data-page');
-                if (linkPage === currentPage) {
+                if (isLinkActive(link)) {
                     link.classList.add('active');
                 }
             });
 
             // Add active class to matching nav links (mobile)
             document.querySelectorAll('.nav-link-mobile').forEach(link => {
-                const linkPage = link.getAttribute('data-page');
-                if (linkPage === currentPage) {
+                if (isLinkActive(link)) {
                     link.classList.add('active');
                 }
+            });
+
+            // Update active state on hash change
+            window.addEventListener('hashchange', function () {
+                const newHash = window.location.hash.replace('#', '');
+
+                document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(link => {
+                    link.classList.remove('active');
+                    const linkHash = link.getAttribute('data-hash');
+                    const linkPage = link.getAttribute('data-page');
+
+                    if (linkPage === currentPage && linkHash === newHash) {
+                        link.classList.add('active');
+                    }
+                });
             });
         });
     </script>

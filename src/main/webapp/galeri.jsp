@@ -42,41 +42,12 @@
                         class="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
                         Galeri CineGO
                     </h1>
-                    <p class="text-xl text-gray-300 leading-relaxed">
-                        Jelajahi momen-momen terbaik dari pengalaman sinema kami
-                    </p>
+                    
                 </div>
             </div>
         </section>
 
-        <!-- Filter Section -->
-        <section class="py-8 bg-slate-900/50">
-            <div class="container mx-auto px-4 lg:px-8">
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button @click="filterGallery('all')"
-                        :class="currentFilter === 'all' ? 'bg-gradient-to-r from-red-500 to-red-700' : 'bg-slate-800 hover:bg-slate-700'"
-                        class="px-6 py-2 rounded-lg transition">
-                        <i class="fas fa-th mr-2"></i>Semua
-                    </button>
-                    <button @click="filterGallery('cinema')"
-                        :class="currentFilter === 'cinema' ? 'bg-gradient-to-r from-red-500 to-red-700' : 'bg-slate-800 hover:bg-slate-700'"
-                        class="px-6 py-2 rounded-lg transition">
-                        <i class="fas fa-building mr-2"></i>Interior Bioskop
-                    </button>
-                    <button @click="filterGallery('movies')"
-                        :class="currentFilter === 'movies' ? 'bg-gradient-to-r from-red-500 to-red-700' : 'bg-slate-800 hover:bg-slate-700'"
-                        class="px-6 py-2 rounded-lg transition">
-                        <i class="fas fa-film mr-2"></i>Film
-                    </button>
-                    <button @click="filterGallery('events')"
-                        :class="currentFilter === 'events' ? 'bg-gradient-to-r from-red-500 to-red-700' : 'bg-slate-800 hover:bg-slate-700'"
-                        class="px-6 py-2 rounded-lg transition">
-                        <i class="fas fa-calendar mr-2"></i>Event
-                    </button>
-                </div>
-            </div>
-        </section>
-
+    
         <!-- Gallery Grid -->
         <section class="py-20">
             <div class="container mx-auto px-4 lg:px-8">
@@ -117,7 +88,7 @@
         <!-- Lightbox Modal -->
         <div x-show="lightboxOpen" x-transition @click="closeLightbox()"
             class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" style="display: none;">
-            <div class="relative max-w-5xl w-full" @click.stop>
+            <div class="relative max-w-3xl w-full" @click.stop>
                 <button @click="closeLightbox()"
                     class="absolute -top-12 right-0 text-white hover:text-red-500 transition">
                     <i class="fas fa-times text-3xl"></i>
